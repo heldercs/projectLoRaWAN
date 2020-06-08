@@ -165,7 +165,7 @@ int main (int argc, char *argv[]){
 	string fileMetric="./scratch/result-STAs.dat";
  	string fileData="./scratch/mac-STAs-GW-1.txt";
 	string endDevFile="./TestResult/test";
-	bool flagRtx=1;
+	bool flagRtx=0;
   	uint32_t nSeed=1;
 	int trial=1; //, numRTX=0;
 	double packLoss=0, sent=0, received=0, avgDelay=0;

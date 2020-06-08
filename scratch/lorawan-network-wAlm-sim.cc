@@ -191,7 +191,7 @@ int main (int argc, char *argv[]){
 	string endDevRegFile="./TestResult/test";
 	string endDevAlmFile="./TestResult/test";
 	string gwFile="./TestResult/test";
-	bool flagRtx=1;
+	bool flagRtx=0;
   	uint32_t nSeed=1;
 	int trial=1; //, numRTX=0;
 	double packLoss=0, sent=0, received=0, avgDelay=0;
@@ -556,7 +556,7 @@ int main (int argc, char *argv[]){
    	NS_LOG_INFO(nDevices << "       |  " << throughput << "    |  " << probSucc << "   |  " << probLoss << "   |  " << avgDelay);
 	NS_LOG_INFO("------------------------------------------------------------------" << endl);
 
-  	myfile.open (fileRegMetric, ios::out | ios::app);
+  	myfile.open (fileAlmMetric, ios::out | ios::app);
   	myfile << nDevices << ", " << throughput << ", " << probSucc << ", " <<  probLoss  << avgDelay << "\n";
   	myfile.close();  
   
@@ -566,7 +566,7 @@ int main (int argc, char *argv[]){
   	NS_LOG_INFO("sent:" << sent << "      succ:" << received << "       drop:"<< packLoss  << "   delay:" << avgDelay);
   	NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl);
 
-  	myfile.open (fileRegData, ios::out | ios::app);
+  	myfile.open (fileAlmData, ios::out | ios::app);
   	myfile << "sent: " << sent << " succ: " << received << " drop: "<< packLoss << "\n";
   	myfile << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << "\n";
   	myfile << "numDev: " << nDevices << " numGat: " << nGateways << " simTime: " << simulationTime << " throughput: " << throughput<< "\n";
