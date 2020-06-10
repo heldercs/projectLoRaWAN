@@ -51,11 +51,10 @@ set style rect fc lt -1 fs solid 0.15 noborder
 #filename='endDevices.dat'
 
 # load the building locations
-#load 'buildings.dat'
+#load 'buildings.txt'
 
 # Plot the data
 #plot filename_edR using 1:2:3 with points ps 2 pt 7 lc 'black' t 'ED Regular', filename_edR using 1:2:3 with points ps 2 pt 7 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 11 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 10 lw 5 lc 'black' t 'ED Alarm', filename_gw using 1:2 with points ls 3 t 'Gateway'
 #plot filename_edR using 1:2:3 with points ps 2 pt 7 lc 'black' t 'ED Regular', filename_edR using 1:2:3 with points ps 2 pt 7 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 11 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 10 lw 5 lc 'black' t 'ED Alarm', filename_gw using 1:2 with points ls 3 t 'Gateway', filename_gw with boxes fs solid 1 lc rgb 'grey90' lw 16 t 'Obstacles'
-plot filename_edR using 1:2:3 with points ps 2 pt 7 lc 'black' t 'Nodes', filename_edR using 1:2:3 with points pt 7 palette notitle, filename_gw using 1:2 with points ls 3 t 'Gateway'
-#plot filename_edR using 1:2:3 with points ps 2 pt 7 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 11 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 10 lw 5 lc 'black' notitle, filename_gw using 1:2 with points ls 3 notitle
-#
+#plot filename_edR using 1:2:3 with points ps 2 pt 7 lc 'black' t 'Nodes', filename_edR using 1:2:3 with points pt 7 palette notitle, filename_gw using 1:2 with points ls 3 t 'Gateway'
+plot filename_edR using 1:2:3 with points ps 2 pt 7 lc 'black' t 'Nodes', filename_edR using 1:2:3 with points pt 7 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 11 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 10 lw 5 lc 'black' t 'Alarms', filename_gw using 1:2 with points ls 3 t 'Gateway'

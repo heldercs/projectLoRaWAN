@@ -4,9 +4,11 @@
 *.png
 *.eps
 *.dat
+.*.swp
 .lock-waf_linux_build
 build/
 utils.pyc
+buildings.txt
 __pycache__/
 waf-tools/
 .waf3-2.0.18-ff4ae9f5cc05353d3dc3aeff8854ae69/

@@ -48,7 +48,7 @@ using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("LorawanNetworkSimulator");
 
-#define MAXRTX	8
+#define MAXRTX 4
 
 // Network settings
 int nDevices = 200;
@@ -73,8 +73,8 @@ bool printEDs = true;
  *  Description:  
  * =====================================================================================
  */
-void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways, std::string filename){
-  	const char * c = filename.c_str ();
+void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways, std::string filename1, std::string filename2){
+  	const char * c = filename1.c_str ();
 	vector<int> countSF(6,0);
   	std::ofstream spreadingFactorFile;
   	spreadingFactorFile.open (c);
@@ -92,6 +92,10 @@ void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways, std::str
       	Vector pos = position->GetPosition ();
       	spreadingFactorFile << pos.x << " " << pos.y << " " << sf << endl;
   	}
+  	spreadingFactorFile.close ();
+
+	c = filename2.c_str ();
+  	spreadingFactorFile.open (c);
   	// Also print the gateways
   	for (NodeContainer::Iterator j = gateways.Begin (); j != gateways.End (); ++j){
     	Ptr<Node> object = *j;
@@ -111,10 +115,10 @@ void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways, std::str
  */
 void buildingHandler ( NodeContainer endDevices, NodeContainer gateways ){
 
-	double xLength = 130;
-  	double deltaX = 32;
-  	double yLength = 64;
-  	double deltaY = 17;
+	double xLength = 230;
+  	double deltaX = 80;
+  	double yLength = 164;
+  	double deltaY = 57;
  	int gridWidth = 2 * radius / (xLength + deltaX);
   	int gridHeight = 2 * radius / (yLength + deltaY);
 
@@ -142,6 +146,7 @@ void buildingHandler ( NodeContainer endDevices, NodeContainer gateways ){
 
   	BuildingsHelper::Install (endDevices);
   	BuildingsHelper::Install (gateways);
+    BuildingsHelper::MakeMobilityModelConsistent ();
 
   	// Print the buildings
   	if (printBuildings){
@@ -165,9 +170,11 @@ int main (int argc, char *argv[]){
 	string fileMetric="./scratch/result-STAs.dat";
  	string fileData="./scratch/mac-STAs-GW-1.txt";
 	string endDevFile="./TestResult/test";
+	string gwFile="./TestResult/test";
 	bool flagRtx=0;
   	uint32_t nSeed=1;
 	int trial=1; //, numRTX=0;
+	vector<int> sfQuant(6,0);
 	double packLoss=0, sent=0, received=0, avgDelay=0;
 	double angle=0, sAngle=M_PI;
 	double throughput=0, probSucc=0, probLoss=0;
@@ -187,9 +194,10 @@ int main (int argc, char *argv[]){
   	cmd.Parse (argc, argv);
 
 	endDevFile += to_string(trial) + "/endDevices" + to_string(nDevices) + ".dat";
+	gwFile += to_string(trial) + "/GWs" + to_string(nGateways) + ".dat";
 
   	// Set up logging
-  	// LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
+  	 LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraPacketTracker", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraChannel", LOG_LEVEL_INFO);
   	// LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
@@ -292,16 +300,16 @@ int main (int argc, char *argv[]){
 
   	// Assign a mobility model to each node
   	mobility.Install (endDevices);
-  	//uint32_t x =2000;
+  	//int x =-2130.00, y= 1800.00;
   	// Make it so that nodes are at a certain height > 0
   	for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j){
       	Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel> ();
       	Vector position = mobility->GetPosition ();
 	  	//position.x = x;
-		//position.y=0;
+		//position.y = y;
       	position.z = 1.2;
       	mobility->SetPosition (position);
-		//x +=1000;
+		//x +=2500;
     }
 
   	// Create the LoraNetDevices of the end devices
@@ -373,7 +381,12 @@ int main (int argc, char *argv[]){
    	*  Set up the end device's spreading factor  *
    	**********************************************/
 
-  	macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
+  	sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
+
+	cout << "SFs: ";
+	for (int i=0; i< 6;i++)	
+		cout << "  " << sfQuant.at(i);
+	cout << endl;
 
   	NS_LOG_DEBUG ("Completed configuration");
 
@@ -417,8 +430,7 @@ int main (int argc, char *argv[]){
    	* Print output files *
    	*********************/
   	if (printEDs){
-    	PrintEndDevices (endDevices, gateways,
-        	               endDevFile);
+    	PrintEndDevices (endDevices, gateways, endDevFile, gwFile);
  	}
 
   	////////////////
@@ -472,17 +484,18 @@ int main (int argc, char *argv[]){
   	myfile << "##################################################################" << "\n\n";
   	myfile.close();  
 
-	//NS_LOG_INFO << "\nprintPhyPacketsPerGW:" <<endl;
+	//cout << "\nprintPhyPacketsPerGW:" <<endl;
 	//for (int i=0; i<6;i++)
-	//NS_LOG_INFO << tracker.CountPhyPacketsPerGw (Seconds (0), appStopTime + Hours (1), nDevices).at(i) << " ";
-	//NS_LOG_INFO << endl;
+	//cout << tracker.CountPhyPacketsPerGw (Seconds (0), appStopTime + Hours (1), nDevices).at(i) << " ";
+	//cout << endl;
 
-  	//NS_LOG_INFO << "\nprintPhyPacketsPerGW:\n"<< tracker.PrintPhyPacketsPerGw (Seconds (0), appStopTime + Hours (1), nDevices) << endl;
+	//for (int i=0; i<nGateways; i++)
+  	//	cout << "\nprintPhyPacketsPerGW:\n"<< tracker.PrintPhyPacketsPerGw (Seconds (0), appStopTime + Hours (1), nDevices+i) << endl;
 
-	//NS_LOG_INFO << "\ncountMacPAcketsGlobally:\n" << tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1)) << endl;
+	//cout << "\ncountMacPAcketsGlobally:\n" << tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1)) << endl;
 
 	//if (flagRtx){
-	//	NS_LOG_INFO << "\ncountMacPAcketsGloballyCpsr:\n" << tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1)) << endl;
+	//	cout << "\ncountMacPAcketsGloballyCpsr:\n" << tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1)) << endl;
 	//	tracker.PrintRetransmissions(Seconds(0), appStopTime + Hours(1), nDevices, MAXRTX);
 	//}
 

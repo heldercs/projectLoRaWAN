@@ -578,7 +578,8 @@ int main (int argc, char *argv[]){
 	//NS_LOG_INFO << tracker.CountPhyPacketsPerGw (Seconds (0), appStopTime + Hours (1), nDevices).at(i) << " ";
 	//NS_LOG_INFO << endl;
 
-  	//NS_LOG_INFO << "\nprintPhyPacketsPerGW:\n"<< tracker.PrintPhyPacketsPerGw (Seconds (0), appStopTime + Hours (1), nDevices) << endl;
+	//for (int i=0; i<nGateways; i++)
+  	//	cout << "\nprintPhyPacketsPerGW:\n"<< tracker.PrintPhyPacketsPerGw (Seconds (0), appStopTime + Hours (1), nDevices+i) << endl;
 
 	//NS_LOG_INFO << "\ncountMacPAcketsGlobally:\n" << tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1)) << endl;
 

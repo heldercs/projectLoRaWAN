@@ -73,7 +73,7 @@ LoraPacketTracker::RequiredTransmissionsCallback (uint8_t reqTx, bool success,
   NS_LOG_DEBUG ("Packet: " << packet << "ReqTx " << unsigned(reqTx) <<
                 ", succ: " << success << ", firstAttempt: " <<
                 firstAttempt.GetSeconds ());
-
+  
   RetransmissionStatus entry;
   entry.firstAttempt = firstAttempt;
   entry.finishTime = Simulator::Now ();
