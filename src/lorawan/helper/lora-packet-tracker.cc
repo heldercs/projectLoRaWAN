@@ -522,7 +522,28 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
   std::string output ("");
   for (int i = 0; i < 6; ++i)
     {
-      output += std::to_string (packetCounts.at (i)) + " ";
+		switch (i) {
+				case 0:
+						output += "SENT: ";
+						break;
+				case RECEIVED+1:
+						output += "REC: ";
+						break;
+				case INTERFERED+1:
+						output += "INTER: ";
+						break;
+				case NO_MORE_RECEIVERS+1:
+						output += "NO_REC: ";
+						break;
+  				case UNDER_SENSITIVITY+1:
+						output += "USENS: ";
+						break;
+				case LOST_BECAUSE_TX+1:
+						output += "LOST_TX: ";
+				default:	
+						break;
+		}/* -----  end switch  ----- */
+      	output += std::to_string (packetCounts.at (i)) + "\n";
     }
 
   return output;
