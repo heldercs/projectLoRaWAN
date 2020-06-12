@@ -386,10 +386,10 @@ int main (int argc, char *argv[]){
 	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, gateways, channel, radius);
 	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, gateways, channel, radius);
 
-	cout << "SFs: ";
-	for (int i=0; i< 6;i++)	
-		cout << "  " << sfQuant.at(i);
-	cout << endl;
+	//cout << "SFs: ";
+	//for (int i=0; i< 6;i++)	
+	//	cout << "  " << sfQuant.at(i);
+	//cout << endl;
 
   	NS_LOG_DEBUG ("Completed configuration");
 
