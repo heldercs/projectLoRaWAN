@@ -197,7 +197,7 @@ int main (int argc, char *argv[]){
 	gwFile += to_string(trial) + "/GWs" + to_string(nGateways) + ".dat";
 
   	// Set up logging
-  	//  LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
+  	// LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraPacketTracker", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraChannel", LOG_LEVEL_INFO);
   	// LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
