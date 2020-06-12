@@ -99,6 +99,12 @@ public:
    */
   static std::vector<int> SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer gateways,
                                                  Ptr<LoraChannel> channel, bool flgRTX);
+ 
+  static std::vector<int> SetSpreadingFactorsEIB (NodeContainer endDevices, NodeContainer gateways,
+                                                 Ptr<LoraChannel> channel, double rad);
+ 
+  static std::vector<int> SetSpreadingFactorsEAB (NodeContainer endDevices, NodeContainer gateways,
+                                                 Ptr<LoraChannel> channel, double rad);
   /**
    * Set up the end device's data rates according to the given distribution.
    */

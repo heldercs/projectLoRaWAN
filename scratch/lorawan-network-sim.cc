@@ -300,7 +300,7 @@ int main (int argc, char *argv[]){
 
   	// Assign a mobility model to each node
   	mobility.Install (endDevices);
-  	//int x =-2130.00, y= 1800.00;
+  	//int x =10.00, y= 12.00;
   	// Make it so that nodes are at a certain height > 0
   	for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j){
       	Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel> ();
@@ -311,6 +311,7 @@ int main (int argc, char *argv[]){
       	mobility->SetPosition (position);
 		//x +=2500;
     }
+
 
   	// Create the LoraNetDevices of the end devices
   	uint8_t nwkId = 54;
@@ -382,11 +383,13 @@ int main (int argc, char *argv[]){
    	**********************************************/
 
   	sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
+	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, gateways, channel, radius);
+	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, gateways, channel, radius);
 
-	//cout << "SFs: ";
-	//for (int i=0; i< 6;i++)	
-	//	cout << "  " << sfQuant.at(i);
-	//cout << endl;
+	cout << "SFs: ";
+	for (int i=0; i< 6;i++)	
+		cout << "  " << sfQuant.at(i);
+	cout << endl;
 
   	NS_LOG_DEBUG ("Completed configuration");
 
