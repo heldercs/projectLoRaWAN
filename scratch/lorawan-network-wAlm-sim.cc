@@ -182,6 +182,7 @@ void buildingHandler ( NodeContainer endDevices, NodeContainer gateways ){
 }/* -----  end of function buildingHandler  ----- */
 
 
+
 int main (int argc, char *argv[]){
 
 	string fileRegMetric="./scratch/result-STAs.dat";
@@ -194,6 +195,7 @@ int main (int argc, char *argv[]){
 	bool flagRtx=0;
   	uint32_t nSeed=1;
 	int trial=1; //, numRTX=0;
+   	vector<int> sfQuant(6,0);
 	double packLoss=0, sent=0, received=0, avgDelay=0;
 	double angle=0, sAngle=M_PI;
 	double throughput=0, probSucc=0, probLoss=0;
@@ -214,10 +216,14 @@ int main (int argc, char *argv[]){
   	cmd.AddValue ("trial", "set trial parameter", trial);
   	cmd.Parse (argc, argv);
 
-	nAlarms = 10;
-	nRegulars = nDevices - nAlarms;
-	//nRegulars = nDevices/(1.01); 
-	//nAlarms = nDevices - nRegulars;
+	if(nDevices < 1000){
+		nAlarms = 10;
+		nRegulars = nDevices - nAlarms;
+	}else{
+		nRegulars = nDevices/(1.01); 
+		nAlarms = nDevices - nRegulars;
+	}
+
 	NS_LOG_DEBUG("number regular event: " << nRegulars << "number alarm event: " << nAlarms );
 
 
@@ -419,7 +425,23 @@ int main (int argc, char *argv[]){
    	*  Set up the end device's spreading factor  *
    	**********************************************/
 
-  	macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
+  	sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
+	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
+	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
+
+	//cout << "SFs: ";
+	//for (int i=0; i< 6;i++)	
+	//	cout << "  " << sfQuant.at(i);
+	//cout << endl;
+
+	/* spreading factors strategies */
+	//sfQuant = macHelper.SetSpreadingFactorsStrategies (endDevices, sfQuant, (unsigned)nRegulars, (unsigned)nDevices, LorawanMacHelper::SHIFT_TWO);
+
+	//cout << "SFs: ";
+	//for (int i=0; i< 6;i++)	
+	//	cout << "  " << sfQuant.at(i);
+	//cout << endl;
+
 
   	NS_LOG_DEBUG ("Completed configuration");
 

@@ -300,7 +300,7 @@ int main (int argc, char *argv[]){
 
   	// Assign a mobility model to each node
   	mobility.Install (endDevices);
-  	//int x =10.00, y= 12.00;
+  	//int x =4000.00, y= 0;
   	// Make it so that nodes are at a certain height > 0
   	for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j){
       	Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel> ();
@@ -383,13 +383,14 @@ int main (int argc, char *argv[]){
    	**********************************************/
 
   	sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
-	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, gateways, channel, radius);
-	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, gateways, channel, radius);
+	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
+	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
 
 	//cout << "SFs: ";
 	//for (int i=0; i< 6;i++)	
 	//	cout << "  " << sfQuant.at(i);
 	//cout << endl;
+
 
   	NS_LOG_DEBUG ("Completed configuration");
 
@@ -408,7 +409,6 @@ int main (int argc, char *argv[]){
 	//RandomSenderHelper appHelper = RandomSenderHelper ();
   	//appHelper.SetMean (appPeriodSeconds);
   	//ApplicationContainer appContainer = appHelper.Install (endDevices);
-
 
   	appContainer.Start (Seconds (0));
   	appContainer.Stop (appStopTime);
@@ -457,8 +457,11 @@ int main (int argc, char *argv[]){
 	stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1))) >> sent >> received;
 	
 	if(flagRtx)
-      stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
-		
+    	stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
+	else
+		stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), nDevices, nGateways)) >> avgDelay;
+
+	
 	packLoss = sent - received;
   	throughput = received/simulationTime;
 

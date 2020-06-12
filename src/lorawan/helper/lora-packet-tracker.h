@@ -172,6 +172,9 @@ public:
   std::string CountMacPacketsGloballyCpsr (Time startTime, Time stopTime, 
 											bool nodeType, uint32_t nodeEdge, uint32_t nDev);
 
+  std::string CountMacPacketsGloballyDelay (Time startTime, Time stopTime, 
+											int gwId, int gwNum);
+ 
 private:
   PhyPacketData m_packetTracker;
   MacPacketData m_macPacketTracker;

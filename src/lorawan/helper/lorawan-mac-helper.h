@@ -48,6 +48,11 @@ public:
   enum Regions { EU, US, China, EU433MHz, Australia, CN, AS923MHz, SouthKorea, ALOHA };
 
   /**
+   * Define the operational region.
+   */
+  enum StrategieSF { SHIFT_ONE, SHIFT_TWO, RESERVE };
+
+  /**
    * Create a mac helper without any parameter set. The user must set
    * them all to be able to call Install later.
    */
@@ -100,11 +105,14 @@ public:
   static std::vector<int> SetSpreadingFactorsUp (NodeContainer endDevices, NodeContainer gateways,
                                                  Ptr<LoraChannel> channel, bool flgRTX);
  
-  static std::vector<int> SetSpreadingFactorsEIB (NodeContainer endDevices, NodeContainer gateways,
-                                                 Ptr<LoraChannel> channel, double rad);
+  static std::vector<int> SetSpreadingFactorsEIB (NodeContainer endDevices, double rad);
  
-  static std::vector<int> SetSpreadingFactorsEAB (NodeContainer endDevices, NodeContainer gateways,
-                                                 Ptr<LoraChannel> channel, double rad);
+  static std::vector<int> SetSpreadingFactorsEAB (NodeContainer endDevices, double rad);
+
+  static std::vector<int> SetSpreadingFactorsStrategies (NodeContainer endDevices, std::vector<int> sfQuantity, 
+														 uint32_t edge, uint32_t nDev, 
+														 uint8_t mode);
+
   /**
    * Set up the end device's data rates according to the given distribution.
    */
