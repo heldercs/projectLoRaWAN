@@ -39,6 +39,8 @@ RandomSenderHelper::RandomSenderHelper (){
 
 	m_initialDelay = CreateObject<ExponentialRandomVariable> ();
 	m_initialDelay->SetAttribute ("Mean", DoubleValue (10));
+
+  	m_pktSize = 5;
 }
 
 RandomSenderHelper::~RandomSenderHelper (){
@@ -74,6 +76,7 @@ Ptr<Application> RandomSenderHelper::InstallPriv (Ptr<Node> node) const{
                 initTime.GetSeconds() << " Seconds");
 
  	app->SetInitialDelay (initTime);
+  	app->SetPacketSize (m_pktSize);
 	app->SetMean (m_initialDelay->GetMean());
   	app->SetNode (node);
   	node->AddApplication (app);
@@ -83,6 +86,11 @@ Ptr<Application> RandomSenderHelper::InstallPriv (Ptr<Node> node) const{
 
 void RandomSenderHelper::SetMean (int mean) {
 	m_initialDelay->SetAttribute ("Mean", DoubleValue (mean));
+}
+
+
+void RandomSenderHelper::SetPacketSize (uint8_t size){
+  	m_pktSize = size;
 }
 
 }

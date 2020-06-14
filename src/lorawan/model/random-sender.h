@@ -45,6 +45,11 @@ public:
   	void SetMean (double);
 
   	/**
+   	* Set packet size
+   	*/
+  	void SetPacketSize (uint8_t size);
+
+  	/**
    	* Send a packet using the LoraNetDevice's Send method
    	*/
   	void SendPacket (void);
@@ -89,6 +94,11 @@ private:
 	* Whether or not this application uses a random packet size.
    	*/
   	bool m_randomPktSize;
+
+  	/**
+   	* The packet size.
+   	*/
+  	uint8_t m_basePktSize;
 };
 
 } //namespace ns3

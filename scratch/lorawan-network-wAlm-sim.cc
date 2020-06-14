@@ -220,7 +220,7 @@ int main (int argc, char *argv[]){
   	cmd.AddValue ("trial", "set trial parameter", trial);
   	cmd.Parse (argc, argv);
 
-	if(nDevices < 1000){
+  	if(nDevices < 1000){
 		nAlarms = 10;
 		nRegulars = nDevices - nAlarms;
 	}else{
@@ -457,6 +457,7 @@ int main (int argc, char *argv[]){
 
   	PeriodicSenderHelper appRegularHelper = PeriodicSenderHelper ();
   	appRegularHelper.SetPeriod (Seconds (appPeriodSeconds));
+  	appRegularHelper.SetPacketSize (19);
   	ApplicationContainer appRegContainer = appRegularHelper.Install (endDevices.Get(0));
 	for(int j = 1; j < nRegulars; j++)
 		appRegContainer.Add(appRegularHelper.Install(endDevices.Get(j)));	
@@ -467,6 +468,7 @@ int main (int argc, char *argv[]){
 
    	RandomSenderHelper appAlarmHelper = RandomSenderHelper ();
     appAlarmHelper.SetMean (appPeriodSeconds);
+  	appAlarmHelper.SetPacketSize (5);
 	ApplicationContainer appAlmContainer = appAlarmHelper.Install (endDevices.Get(nRegulars));
 	for(int j = (nRegulars + 1); j < nDevices; j++)
 		appAlmContainer.Add(appAlarmHelper.Install(endDevices.Get(j)));	

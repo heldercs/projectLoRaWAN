@@ -58,12 +58,16 @@ public:
    	*/
   	void SetMean (int mean);
 
+	void SetPacketSize (uint8_t size);
+
 private:
 	Ptr<Application> InstallPriv (Ptr<Node> node) const;
 
   	ObjectFactory m_factory;
 
   	Ptr<ExponentialRandomVariable> m_initialDelay;
+
+  	uint8_t m_pktSize; // the packet size.
 };
 
 }
