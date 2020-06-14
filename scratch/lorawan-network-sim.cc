@@ -459,7 +459,7 @@ int main (int argc, char *argv[]){
 	if(flagRtx)
     	stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
 	else
-		stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), nDevices, nGateways)) >> avgDelay;
+		stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways)) >> avgDelay;
 
 	
 	packLoss = sent - received;

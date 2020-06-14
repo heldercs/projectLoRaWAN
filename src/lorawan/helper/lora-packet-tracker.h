@@ -173,7 +173,10 @@ public:
 											bool nodeType, uint32_t nodeEdge, uint32_t nDev);
 
   std::string CountMacPacketsGloballyDelay (Time startTime, Time stopTime, 
-											int gwId, int gwNum);
+											uint32_t gwId, uint32_t gwNum);
+  std::string CountMacPacketsGloballyDelay (Time startTime, Time stopTime, 
+											bool nodeType, uint32_t nodeEdge, 
+											uint32_t gwId, uint32_t gwNum);
  
 private:
   PhyPacketData m_packetTracker;

@@ -647,13 +647,13 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
   }
 
   std::string
-  LoraPacketTracker::CountMacPacketsGloballyDelay (Time startTime, Time stopTime, int gwId, int gwNum)
+  LoraPacketTracker::CountMacPacketsGloballyDelay (Time startTime, Time stopTime, uint32_t gwId, uint32_t gwNum)
   {
   	Time delaySum = Seconds (0);
   	double avgDelay = 0;
   	int packetsOutsideTransient = 0;
 
-	for (int i = gwId; i<gwId+gwNum;i++ )
+	for (uint32_t i = gwId; i < (gwId+gwNum); i++)
 	{
   		for (auto itMac = m_macPacketTracker.begin (); itMac != m_macPacketTracker.end (); ++itMac)
     	{
@@ -661,12 +661,11 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
 
       		if ((*itMac).second.sendTime > startTime && (*itMac).second.sendTime < stopTime)
         	{
-
           		packetsOutsideTransient++;
-		  
+
           		// Compute delays
           		/////////////////
-          		if ((*itMac).second.receptionTimes.find(Simulator::GetContext ())->second == Time::Max ())
+          		if ((*itMac).second.receptionTimes.find(gwId)->second == Time::Max () || (*itMac).second.receptionTimes.find(gwId)->second < (*itMac).second.sendTime )
             	{
               		// NS_LOG_DEBUG ("Packet never received, ignoring it");
               		packetsOutsideTransient--;
@@ -679,7 +678,74 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
         	}
     	}
 	}
-	//cout << "d: " << delaySum.GetSeconds() << endl;
+	//cout << "trans: " << packetsOutsideTransient << " d: " << delaySum.GetSeconds() << endl;
+
+  	if (packetsOutsideTransient != 0)
+    {
+      avgDelay = (delaySum/packetsOutsideTransient).GetSeconds ();
+    }
+	
+	return(std::to_string(avgDelay));
+
+}
+
+  std::string
+  LoraPacketTracker::CountMacPacketsGloballyDelay (Time startTime, Time stopTime, bool nodeType, uint32_t nodeEdge, uint32_t gwId, uint32_t gwNum)
+  {
+  	Time delaySum = Seconds (0);
+  	double avgDelay = 0;
+  	int packetsOutsideTransient = 0;
+
+	for (uint32_t i = gwId; i < (gwId+gwNum); i++)
+	{
+  		for (auto itMac = m_macPacketTracker.begin (); itMac != m_macPacketTracker.end (); ++itMac)
+    	{
+      	// NS_LOG_DEBUG ("Dealing with packet " << (*itMac).first);
+			if (nodeType){
+				if ((*itMac).second.senderId >= 0 && (*itMac).second.senderId < nodeEdge){
+      				if ((*itMac).second.sendTime > startTime && (*itMac).second.sendTime < stopTime)
+        			{
+    	      			packetsOutsideTransient++;
+
+        	  			// Compute delays
+          				/////////////////
+ 		          		if ((*itMac).second.receptionTimes.find(gwId)->second == Time::Max () || 
+							(*itMac).second.receptionTimes.find(gwId)->second < (*itMac).second.sendTime ||
+							(*itMac).second.receptionTimes.find(gwId)->second.GetSeconds() - (*itMac).second.sendTime.GetSeconds() > 10 )
+            			{
+              				// NS_LOG_DEBUG ("Packet never received, ignoring it");
+              				packetsOutsideTransient--;
+           	 			}
+          				else
+            			{
+              				delaySum += (*itMac).second.receptionTimes.find(gwId)->second  - (*itMac).second.sendTime;
+ 	          			}
+        			}
+				}
+			}
+			else
+			{
+	    		if ((*itMac).second.senderId >= nodeEdge && (*itMac).second.senderId < gwId){
+ 					if ((*itMac).second.sendTime > startTime && (*itMac).second.sendTime < stopTime)
+        			{
+    	      			packetsOutsideTransient++;
+        	  			// Compute delays
+          				/////////////////
+    		          	if ((*itMac).second.receptionTimes.find(gwId)->second == Time::Max () || (*itMac).second.receptionTimes.find(gwId)->second < (*itMac).second.sendTime )
+           				{
+              				// NS_LOG_DEBUG ("Packet never received, ignoring it");
+              				packetsOutsideTransient--;
+           	 			}
+          				else
+            			{
+              				delaySum += (*itMac).second.receptionTimes.find(gwId)->second  - (*itMac).second.sendTime;
+            			}
+        			}
+				}
+			}
+    	}
+	}
+	//cout << "Trans: " << packetsOutsideTransient << " d: " << delaySum.GetSeconds() << endl;
 
   	if (packetsOutsideTransient != 0)
     {

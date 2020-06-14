@@ -69,6 +69,10 @@ bool printBuildings = false;
 bool printEDs = true;
 
 
+enum nodeType { ALARM, REGULAR };				/* ----------  end of enum nodeType  ---------- */
+
+typedef enum nodeType NodeType;
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  printEndDevices
@@ -232,8 +236,8 @@ int main (int argc, char *argv[]){
 	gwFile += to_string(trial) + "/GWs" + to_string(nGateways) + ".dat";
 
   	// Set up logging
-  	//LogComponentEnable ("LorawanNetworkWithAlmSimulator", LOG_LEVEL_ALL);
-  	//LogComponentEnable("LoraPacketTracker", LOG_LEVEL_ALL);
+  	// LogComponentEnable ("LorawanNetworkWithAlmSimulator", LOG_LEVEL_ALL);
+  	// LogComponentEnable("LoraPacketTracker", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraChannel", LOG_LEVEL_INFO);
   	// LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
   	// LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
@@ -515,7 +519,10 @@ int main (int argc, char *argv[]){
 
   	LoraPacketTracker &tracker = helper.GetPacketTracker ();
 
-	stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), 1, (unsigned)nRegulars, (unsigned)nDevices)) >> sent >> received;
+	stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), REGULAR, (unsigned)nRegulars, (unsigned)nDevices)) >> sent >> received;
+
+	stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), REGULAR, (unsigned)nRegulars, (unsigned)nDevices, (unsigned)nGateways)) >> avgDelay;		
+ 
 
 	packLoss = sent - received;
   	throughput = received/simulationTime;
@@ -562,10 +569,12 @@ int main (int argc, char *argv[]){
 	NS_LOG_INFO ("//   Computing alarms performance metrics   //");
  	NS_LOG_INFO ("//////////////////////////////////////////////" << endl);
 
-	stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), 0, (unsigned)nRegulars, (unsigned)nDevices)) >> sent >> received;
+	stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), ALARM, (unsigned)nRegulars, (unsigned)nDevices)) >> sent >> received;
 
 	if (flagRtx)
-		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1), 0, (unsigned)nRegulars, (unsigned)nDevices)) >> avgDelay;
+		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1), ALARM, (unsigned)nRegulars, (unsigned)nDevices)) >> avgDelay;
+	else
+		stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), ALARM, (unsigned)nRegulars, (unsigned)nDevices, (unsigned)nGateways)) >> avgDelay;		
  
 	packLoss = sent - received;
   	throughput = received/simulationTime;
