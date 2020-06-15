@@ -75,6 +75,97 @@ typedef enum nodeType NodeType;
 
 /* 
  * ===  FUNCTION  ======================================================================
+ *         Name:  starEdge
+ *  Description: Alarms topology in start 
+ * =====================================================================================
+ */
+void starEdge ( NodeContainer endDevices ){	
+    double angleAlm=0, sAngleAlm=M_PI/2;
+    int radiusAlm=7800;
+    uint8_t op=nAlarms%4, count=4, count2=2;
+    //double angleAlm=0, sAngleAlm=3*M_PI/4;    
+    
+	//iterate our nodes and print their position.
+    for (int j = nRegulars; j < nDevices; ++j){
+        Ptr<Node> object = endDevices.Get(j);
+        Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
+        NS_ASSERT (position != 0);
+        Vector pos = position->GetPosition ();
+        switch (op) {
+                case 0:
+                        pos.x = radiusAlm * cos(angleAlm);
+                        pos.y = radiusAlm * sin(angleAlm);
+                        if(count==1){
+                            if (nAlarms < 15)
+                                radiusAlm -= 2000; // openField 1000; bigPlant 500
+                            else if (nAlarms < 18)
+								radiusAlm -= 1500;
+                            else if (nAlarms < 21)
+								radiusAlm -= 1400;
+                            else if (nAlarms < 23)
+								radiusAlm -= 1100;
+				            else if (nAlarms < 28)
+								radiusAlm -= 850;
+							else
+                                radiusAlm -= 800;
+						
+							angleAlm += M_PI/4;
+                            count=5;
+                        }
+                        count--;
+                        break;
+                case 1:
+                        pos.x = 800;
+                        pos.y = 800;
+                        op = 0;
+                        break;
+                case 2:
+						if (nAlarms < 12){
+			       			pos.x = 3500 * cos(angleAlm); // opendFiled 2000; bigPlant 150
+                        	pos.y = 3500 * sin(angleAlm);
+						}else if (nAlarms < 16){
+			       			pos.x = 2000 * cos(angleAlm); // opendFiled 2000; bigPlant 250
+                        	pos.y = 2000 * sin(angleAlm);
+						}else{
+                        	pos.x = 1300 * cos(angleAlm);
+                        	pos.y = 1300 * sin(angleAlm);
+						}
+                        
+						if(count2==2){
+                            sAngleAlm = M_PI;
+                        }else{
+                            //angleAlm = M_PI/4;
+                            sAngleAlm = M_PI/2;
+                            op = 0;
+                        }
+                        count2--;
+                        break;
+                case 3:
+			       		pos.x = 2500 * cos(angleAlm); //openField 2000; bigPlant 500
+                        pos.y = 2500 * sin(angleAlm);
+                        
+						if(count2==2){
+                            sAngleAlm = M_PI;
+                        }else{
+                            angleAlm = 0;
+                            sAngleAlm = M_PI/2;
+                            op = 1;
+                        }
+                        count2--;
+                        break;
+                default:
+                        break;
+        }// -----  end switch  ----- 
+        position->SetPosition (pos);
+        angleAlm += sAngleAlm;
+        //radiusAlm -= 1000;
+    }	
+}		/* -----  end of function startEdge  ----- */
+
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
  *         Name:  printEndDevices
  *  Description:  
  * =====================================================================================
@@ -220,7 +311,8 @@ int main (int argc, char *argv[]){
   	cmd.AddValue ("trial", "set trial parameter", trial);
   	cmd.Parse (argc, argv);
 
-  	if(nDevices < 1000){
+	
+ 	if(nDevices < 1000){
 		nAlarms = 10;
 		nRegulars = nDevices - nAlarms;
 	}else{
@@ -351,6 +443,12 @@ int main (int argc, char *argv[]){
 		//x +=1000;
     }
 
+	/**************************************
+  	*  Set up topologies for the alarms   *
+  	***************************************/
+	// start edges 
+	//starEdge(endDevices);
+
   	// Create the LoraNetDevices of the end devices
   	uint8_t nwkId = 54;
   	uint32_t nwkAddr = 1864;
@@ -462,7 +560,7 @@ int main (int argc, char *argv[]){
 	for(int j = 1; j < nRegulars; j++)
 		appRegContainer.Add(appRegularHelper.Install(endDevices.Get(j)));	
 
-	NS_LOG_DEBUG("appRegulars -> Time:" << 0 << "  pTime:" << appStopTime.GetSeconds());
+	NS_LOG_DEBUG("appRegulars -> startTime:" << 0 << "  stopTime:" << appStopTime.GetSeconds());
   	appRegContainer.Start (Seconds(0));
   	appRegContainer.Stop (appStopTime);
 

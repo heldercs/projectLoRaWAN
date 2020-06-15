@@ -197,7 +197,7 @@ int main (int argc, char *argv[]){
 	gwFile += to_string(trial) + "/GWs" + to_string(nGateways) + ".dat";
 
   	// Set up logging
-  	// LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
+  	 LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraPacketTracker", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraChannel", LOG_LEVEL_INFO);
   	// LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
@@ -386,10 +386,10 @@ int main (int argc, char *argv[]){
 	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
 	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
 
-	//cout << "SFs: ";
-	//for (int i=0; i< 6;i++)	
-	//	cout << "  " << sfQuant.at(i);
-	//cout << endl;
+	cout << "SFs: ";
+	for (int i=0; i< 6;i++)	
+		cout << "  " << sfQuant.at(i);
+	cout << endl;
 
 
   	NS_LOG_DEBUG ("Completed configuration");
