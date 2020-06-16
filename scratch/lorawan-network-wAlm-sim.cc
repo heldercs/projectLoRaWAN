@@ -636,7 +636,7 @@ int main (int argc, char *argv[]){
 	NS_LOG_INFO("------------------------------------------------------------------" << endl);
 
   	myfile.open (fileRegMetric, ios::out | ios::app);
-  	myfile << nDevices << ", " << throughput << ", " << probSucc << ", " <<  probLoss  << avgDelay << "\n";
+  	myfile << nDevices << ", " << throughput << ", " << probSucc << ", " <<  probLoss << ", "  << avgDelay << "\n";
   	myfile.close();  
   
 
@@ -688,7 +688,7 @@ int main (int argc, char *argv[]){
 	NS_LOG_INFO("------------------------------------------------------------------" << endl);
 
   	myfile.open (fileAlmMetric, ios::out | ios::app);
-  	myfile << nDevices << ", " << throughput << ", " << probSucc << ", " <<  probLoss  << avgDelay << "\n";
+  	myfile << nDevices << ", " << throughput << ", " << probSucc << ", " <<  probLoss  << ", " << avgDelay << "\n";
   	myfile.close();  
   
 

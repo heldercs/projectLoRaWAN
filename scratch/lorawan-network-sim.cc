@@ -474,7 +474,7 @@ int main (int argc, char *argv[]){
 	NS_LOG_INFO("----------------------------------------------------------------"<< endl);
 
   	myfile.open (fileMetric, ios::out | ios::app);
-  	myfile << nDevices << ", " << throughput << ", " << probSucc << ", " <<  probLoss  << avgDelay << "\n";
+  	myfile << nDevices << ", " << throughput << ", " << probSucc << ", " <<  probLoss  << ", " << avgDelay << "\n";
   	myfile.close();  
   
 
