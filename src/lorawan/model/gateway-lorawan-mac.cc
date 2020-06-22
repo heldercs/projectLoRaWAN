@@ -100,7 +100,7 @@ GatewayLorawanMac::Send (Ptr<Packet> packet)
   // Send the packet to the PHY layer to send it on the channel
   m_phy->Send (packet, params, frequency, sendingPower);
 
-  m_sentNewPacket (packet);
+  m_sentNewPacket (packet, params.sf);
 }
 
 bool

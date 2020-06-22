@@ -52,6 +52,7 @@ struct MacPacketStatus
 {
   Ptr<Packet const> packet;
   uint32_t senderId;
+  uint8_t sf;
   Time sendTime;
   Time receivedTime;
   std::map<int, Time> receptionTimes;
@@ -92,7 +93,7 @@ public:
   // MAC layer callbacks //
   /////////////////////////
   // Packet transmission at an EndDevice
-  void MacTransmissionCallback (Ptr<Packet const> packet);
+  void MacTransmissionCallback (Ptr<Packet const> packet, uint8_t sf);
   void RequiredTransmissionsCallback (uint8_t reqTx, bool success,
                                       Time firstAttempt, Ptr<Packet> packet);
   // Packet reception at the Gateway
@@ -155,6 +156,8 @@ public:
    */
   std::string CountMacPacketsGlobally (Time startTime, Time stopTime);
 
+  std::string CountMacPacketsGlobally (Time startTime, Time stopTime, uint8_t sf);
+
   std::string CountMacPacketsGlobally (Time startTime, Time stopTime, 
 										bool nodeType, uint32_t nodeEdge, uint32_t nDev);
 
@@ -174,6 +177,8 @@ public:
 
   std::string CountMacPacketsGloballyDelay (Time startTime, Time stopTime, 
 											uint32_t gwId, uint32_t gwNum);
+  std::string CountMacPacketsGloballyDelay (Time startTime, Time stopTime, 
+											uint32_t gwId, uint32_t gwNum, uint8_t sf);
   std::string CountMacPacketsGloballyDelay (Time startTime, Time stopTime, 
 											bool nodeType, uint32_t nodeEdge, 
 											uint32_t gwId, uint32_t gwNum);

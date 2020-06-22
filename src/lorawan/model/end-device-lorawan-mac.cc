@@ -263,14 +263,14 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
 
           // Sent a new packet
           NS_LOG_DEBUG ("Copied packet: " << m_retxParams.packet);
-          m_sentNewPacket (m_retxParams.packet);
+          m_sentNewPacket (m_retxParams.packet, GetSfFromDataRate (m_dataRate));
 
           // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
           SendToPhy (m_retxParams.packet);
         }
       else
         {
-          m_sentNewPacket (packet);
+          m_sentNewPacket (packet, GetSfFromDataRate (m_dataRate));
           // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (packet);
           SendToPhy (packet);
         }

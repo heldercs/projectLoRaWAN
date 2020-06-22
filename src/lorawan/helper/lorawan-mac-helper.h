@@ -112,6 +112,7 @@ public:
   static std::vector<int> SetSpreadingFactorsStrategies (NodeContainer endDevices, std::vector<int> sfQuantity, 
 														 uint32_t edge, uint32_t nDev, 
 														 uint8_t mode);
+  static std::vector<int> SetSpreadingFactorsProp (NodeContainer endDevices, double rad);
 
   /**
    * Set up the end device's data rates according to the given distribution.

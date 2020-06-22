@@ -228,7 +228,7 @@ protected:
    * Trace source that is fired when a new APP layer packet arrives at the MAC
    * layer.
    */
-  TracedCallback<Ptr<Packet const> > m_sentNewPacket;
+  TracedCallback<Ptr<Packet const>, uint8_t > m_sentNewPacket;
 
   /**
    * The PHY instance that sits under this MAC layer.
