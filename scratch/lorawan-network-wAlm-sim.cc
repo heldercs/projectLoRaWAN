@@ -162,8 +162,6 @@ void starEdge ( NodeContainer endDevices ){
     }	
 }		/* -----  end of function startEdge  ----- */
 
-
-
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  printEndDevices
@@ -529,8 +527,9 @@ int main (int argc, char *argv[]){
 
   	sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
 	//sfQuant = macHelper.SetSpreadingFactorsStrategies (endDevices, sfQuant, nRegulars, nDevices, LorawanMacHelper::SHIFT_ONE);
-	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
-	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
+    //sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
+    //sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
+    //sfQuant = macHelper.SetSpreadingFactorsProp (endDevices, radius);
 
 	//cout << "SFs: ";
 	//for (int i=0; i< 6;i++)	

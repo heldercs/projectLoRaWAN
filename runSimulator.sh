@@ -55,7 +55,7 @@ then
 	touch ./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt
 	file2="./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt"
 
-	for numSta in 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 
+	for numSta in 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 #200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 
 	do
 			echo "trial:$trial-numSTA:$numSta #"
 
@@ -93,7 +93,7 @@ then
 	file4="./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt"
 
 
-	for numSta in 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 
+	for numSta in 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 #200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 
 	do
 			echo "trial:$trial-numSTA:$numSta #"
 

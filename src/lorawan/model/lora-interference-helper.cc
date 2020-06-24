@@ -131,13 +131,13 @@ double minf = std::numeric_limits<double>::min ();
 // _isolation_ matrix instead of a cochannel _rejection_ matrix like in
 // Goursaud's paper.
   std::vector<std::vector<double>> LoraInterferenceHelper::collisionSnirGoursaud= {
-    // SF7  SF8  SF9  SF10 SF11 SF12
-    {6, -16, -18, -19, -19, -20}, // SF7
-    {-24, 6, -20, -22, -22, -22}, // SF8
-    {-27, -27, 6, -23, -25, -25}, // SF9
-    {-30, -30, -30, 6, -26, -28}, // SF10
-    {-33, -33, -33, -33, 6, -29}, // SF11
-    {-36, -36, -36, -36, -36, 6} // SF12
+    // SF7  SF8  SF9  SF10  SF11  SF12
+    {  6,   -16, -18,  -19, -19, -20}, // SF7
+    {-24,     6, -20,  -22, -22, -22}, // SF8
+    {-27,   -27,   6,  -23, -25, -25}, // SF9
+    {-30,   -30, -30,    6, -26, -28}, // SF10
+    {-33,   -33, -33,  -33,   6, -29}, // SF11
+    {-36,   -36, -36,  -36, -36,   6} // SF12
 };
 
 LoraInterferenceHelper::CollisionMatrix LoraInterferenceHelper::collisionMatrix =

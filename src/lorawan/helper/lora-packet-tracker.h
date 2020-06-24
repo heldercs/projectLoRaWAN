@@ -161,6 +161,10 @@ public:
   std::string CountMacPacketsGlobally (Time startTime, Time stopTime, 
 										bool nodeType, uint32_t nodeEdge, uint32_t nDev);
 
+  std::string CountMacPacketsGlobally (Time startTime, Time stopTime, 
+										bool nodeType, uint32_t nodeEdge, 
+										uint32_t nDev, uint8_t sf);
+
   /**
    * Count packets to evaluate the global performance at MAC level of the whole
    * network. In this case, a MAC layer packet is labeled as successful if it

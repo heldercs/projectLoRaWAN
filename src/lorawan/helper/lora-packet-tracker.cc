@@ -648,6 +648,50 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
   }
 
 
+  std::string  LoraPacketTracker::CountMacPacketsGlobally (Time startTime, Time stopTime, bool nodeType, uint32_t nodeEdge, uint32_t nDev, uint8_t sf)
+  {
+    NS_LOG_FUNCTION (this << startTime << stopTime);
+
+  	double sent = 0;
+  	double received = 0;
+ 
+    for (auto it = m_macPacketTracker.begin ();
+         it != m_macPacketTracker.end ();
+         ++it)
+    {
+		//cout << "id: " << (*it).second.senderId << endl;
+		if ((*it).second.sf == sf)
+		{
+			if (nodeType){
+				if ((*it).second.senderId >= 0 && (*it).second.senderId < nodeEdge){
+        			if ((*it).second.sendTime >= startTime && (*it).second.sendTime <= stopTime)
+          			{
+            			sent++;
+            			if ((*it).second.receptionTimes.size ())
+              			{
+             	  		 	received++;
+             			}
+          			}
+				}
+			}else{
+    			if ((*it).second.senderId >= nodeEdge && (*it).second.senderId < nDev){
+        			if ((*it).second.sendTime >= startTime && (*it).second.sendTime <= stopTime)
+          			{
+           		 		sent++;
+           		 		if ((*it).second.receptionTimes.size ())
+           	   			{
+            	    		received++;
+             			}
+          			}
+				}
+			}
+      	}
+	}
+    return std::to_string (sent) + " " +
+      std::to_string (received);
+  }
+
+
   std::string
   LoraPacketTracker::CountMacPacketsGloballyCpsr (Time startTime, Time stopTime)
   {

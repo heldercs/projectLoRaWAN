@@ -300,7 +300,7 @@ int main (int argc, char *argv[]){
 
   	// Assign a mobility model to each node
   	mobility.Install (endDevices);
-  	//int x =5000.00, y= 0;
+  	//int x =5200.00, y= 0;
   	// Make it so that nodes are at a certain height > 0
   	for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j){
       	Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel> ();
@@ -392,7 +392,7 @@ int main (int argc, char *argv[]){
 	for (int i=0; i< 6;i++)	
 		cout << "  " << sfQuant.at(i);
 	cout << endl;
-*/
+ */
 
   	NS_LOG_DEBUG ("Completed configuration");
 
@@ -403,7 +403,7 @@ int main (int argc, char *argv[]){
   	Time appStopTime = Seconds (simulationTime);
    	PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
   	appHelper.SetPeriod (Seconds (appPeriodSeconds));
-  	appHelper.SetPacketSize (19);
+  	appHelper.SetPacketSize (5);
   	ApplicationContainer appContainer = appHelper.Install (endDevices);
   
 /*  	RandomSenderHelper appHelper = RandomSenderHelper ();

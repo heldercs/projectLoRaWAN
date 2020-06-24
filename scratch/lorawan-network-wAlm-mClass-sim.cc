@@ -52,6 +52,8 @@ NS_LOG_COMPONENT_DEFINE ("LorawanNetworkSimulator");
 
 // Network settings
 int nDevices = 200;
+int nRegulars = 150;
+int nAlarms = 10;
 int nGateways = 1;
 double radius = 7500;
 double gatewayRadius = 0;
@@ -68,19 +70,21 @@ bool printEDs = true;
 
 enum SF { SF7=7, SF8, SF9, SF10, SF11, SF12 };
 
+enum nodeType { ALARM, REGULAR };
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  printEndDevices
  *  Description:  
  * =====================================================================================
  */
-void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways, std::string filename1, std::string filename2){
+void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways, std::string filename1, std::string filename2, std::string filename3){
   	const char * c = filename1.c_str ();
-	vector<int> countSF(6,0);
   	std::ofstream spreadingFactorFile;
   	spreadingFactorFile.open (c);
-  	for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j){
-    	Ptr<Node> object = *j;
+	// print for regular event
+  	for (int j = 0; j < nRegulars; ++j){
+    	Ptr<Node> object = endDevices.Get(j);
       	Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
       	NS_ASSERT (position != 0);
       	Ptr<NetDevice> netDevice = object->GetDevice (0);
@@ -88,15 +92,30 @@ void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways, std::str
       	NS_ASSERT (loraNetDevice != 0);
       	Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
       	int sf = int(mac->GetSfFromDataRate(mac->GetDataRate ()));
-		countSF[sf-7]++;
-		//NS_LOG_DEBUG("sf: " << sf);
+      	Vector pos = position->GetPosition ();
+      	spreadingFactorFile << pos.x << " " << pos.y << " " << sf << endl;
+  	}
+	spreadingFactorFile.close ();
+  	
+  	c = filename2.c_str ();
+  	spreadingFactorFile.open (c);
+	// print for alarm event
+  	for (int j = nRegulars; j < nDevices; ++j){
+    	Ptr<Node> object = endDevices.Get(j);
+      	Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
+      	NS_ASSERT (position != 0);
+      	Ptr<NetDevice> netDevice = object->GetDevice (0);
+      	Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      	NS_ASSERT (loraNetDevice != 0);
+      	Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      	int sf = int(mac->GetSfFromDataRate(mac->GetDataRate ()));
       	Vector pos = position->GetPosition ();
       	spreadingFactorFile << pos.x << " " << pos.y << " " << sf << endl;
   	}
   	spreadingFactorFile.close ();
-
-	c = filename2.c_str ();
-  	spreadingFactorFile.open (c);
+  	
+	c = filename3.c_str ();
+  	spreadingFactorFile.open (c);	
   	// Also print the gateways
   	for (NodeContainer::Iterator j = gateways.Begin (); j != gateways.End (); ++j){
     	Ptr<Node> object = *j;
@@ -106,7 +125,6 @@ void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways, std::str
   	}
   	spreadingFactorFile.close ();
 }
-
 
 /* 
  * ===  FUNCTION  ======================================================================
@@ -172,7 +190,8 @@ int main (int argc, char *argv[]){
 	string fileSF8Metric="./scratch/result-STAs.dat";
 	string fileSF9Metric="./scratch/result-STAs.dat";
  	string fileData="./scratch/mac-STAs-GW-1.txt";
-	string endDevFile="./TestResult/test";
+	string endDevRegFile="./TestResult/test";
+	string endDevAlmFile="./TestResult/test";
 	string gwFile="./TestResult/test";
 	bool flagRtx=0;
   	uint32_t nSeed=1;
@@ -198,7 +217,20 @@ int main (int argc, char *argv[]){
   	cmd.AddValue ("trial", "set trial parameter", trial);
   	cmd.Parse (argc, argv);
 
-	endDevFile += to_string(trial) + "/endDevices" + to_string(nDevices) + ".dat";
+	
+ 	if(nDevices < 1000){
+		nAlarms = 10;
+		nRegulars = nDevices - nAlarms;
+	}else{
+		nRegulars = nDevices/(1.01); 
+		nAlarms = nDevices - nRegulars;
+	}
+
+	NS_LOG_DEBUG("number regular event: " << nRegulars << "number alarm event: " << nAlarms );
+
+
+	endDevRegFile += to_string(trial) + "/endDevicesReg" + to_string(nRegulars) + ".dat";
+	endDevAlmFile += to_string(trial) + "/endDevicesAlm" + to_string(nAlarms) + ".dat";
 	gwFile += to_string(trial) + "/GWs" + to_string(nGateways) + ".dat";
 
   	// Set up logging
@@ -332,18 +364,25 @@ int main (int argc, char *argv[]){
 
   	// Now end devices are connected to the channel
 
-  	// Connect trace sources
-  	for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j){
-      	Ptr<Node> node = *j;
-      	Ptr<LoraNetDevice> loraNetDevice = node->GetDevice (0)->GetObject<LoraNetDevice> ();
-      	Ptr<LoraPhy> phy = loraNetDevice->GetPhy ();
-	 
-      	if (flagRtx){
-      		Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac>();
-	  		mac->SetMaxNumberOfTransmissions (MAXRTX);
-	  		mac->SetMType (LorawanMacHeader::CONFIRMED_DATA_UP);
-	  	}
-    }
+ 	// Connect trace sources for Regulars
+  	for (int j = 0; j < nRegulars; ++j){
+			Ptr<Node> node = endDevices.Get(j);
+			Ptr<LoraNetDevice> loraNetDevice = node->GetDevice (0)->GetObject<LoraNetDevice> ();
+			Ptr<LoraPhy> phy = loraNetDevice->GetPhy ();
+	}
+  	
+	// Connect trace sources for Alarms
+  	for (int j = nRegulars; j < nDevices; ++j){
+			Ptr<Node> node = endDevices.Get(j);
+			Ptr<LoraNetDevice> loraNetDevice = node->GetDevice (0)->GetObject<LoraNetDevice> ();
+			Ptr<LoraPhy> phy = loraNetDevice->GetPhy ();
+			
+			if (flagRtx){
+				Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac>();
+				mac->SetMaxNumberOfTransmissions (MAXRTX);
+				mac->SetMType (LorawanMacHeader::CONFIRMED_DATA_UP);
+			}
+	}
 
   	/*********************
    	*  Create Gateways  *
@@ -388,12 +427,12 @@ int main (int argc, char *argv[]){
    	**********************************************/
 
   	sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
-	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
-	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
-	//sfQuant = macHelper.SetSpreadingFactorsWeights (endDevices, (unsigned)nDevices);
+	//sfQuant = macHelper.SetSpreadingFactorsStrategies (endDevices, sfQuant, nRegulars, nDevices, LorawanMacHelper::SHIFT_ONE);
+    //sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
+    //sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
+    //sfQuant = macHelper.SetSpreadingFactorsProp (endDevices, radius);
 
-
-/*  	cout << "SFs: ";
+/*	cout << "SFs: ";
 	for (int i=0; i< 6;i++)	
 		cout << "  " << sfQuant.at(i);
 	cout << endl;
@@ -406,18 +445,28 @@ int main (int argc, char *argv[]){
    	*********************************************/
 
   	Time appStopTime = Seconds (simulationTime);
-  	PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
-  	appHelper.SetPeriod (Seconds (appPeriodSeconds));
-  	appHelper.SetPacketSize (19);
-  	ApplicationContainer appContainer = appHelper.Install (endDevices);
- 
-/*	RandomSenderHelper appHelper = RandomSenderHelper ();
-  	appHelper.SetMean (appPeriodSeconds);
-   	appHelper.SetPacketSize (19);
-  	ApplicationContainer appContainer = appHelper.Install (endDevices);
-*/
-  	appContainer.Start (Seconds (0));
-  	appContainer.Stop (appStopTime);
+
+  	PeriodicSenderHelper appRegularHelper = PeriodicSenderHelper ();
+  	appRegularHelper.SetPeriod (Seconds (appPeriodSeconds));
+  	appRegularHelper.SetPacketSize (19);
+  	ApplicationContainer appRegContainer = appRegularHelper.Install (endDevices.Get(0));
+	for(int j = 1; j < nRegulars; j++)
+		appRegContainer.Add(appRegularHelper.Install(endDevices.Get(j)));	
+
+	NS_LOG_DEBUG("appRegulars -> startTime:" << 0 << "  stopTime:" << appStopTime.GetSeconds());
+  	appRegContainer.Start (Seconds(0));
+  	appRegContainer.Stop (appStopTime);
+
+   	RandomSenderHelper appAlarmHelper = RandomSenderHelper ();
+    appAlarmHelper.SetMean (appPeriodSeconds);
+  	appAlarmHelper.SetPacketSize (5);
+	ApplicationContainer appAlmContainer = appAlarmHelper.Install (endDevices.Get(nRegulars));
+	for(int j = (nRegulars + 1); j < nDevices; j++)
+		appAlmContainer.Add(appAlarmHelper.Install(endDevices.Get(j)));	
+
+	NS_LOG_DEBUG("appAlarms -> startTime:" << 0 << "  stopTime:" << appStopTime.GetSeconds());
+  	appAlmContainer.Start (Seconds(0));
+  	appAlmContainer.Stop (appStopTime);
 
   	/**************************
    	*  Create Network Server  *
@@ -439,7 +488,7 @@ int main (int argc, char *argv[]){
    	* Print output files *
    	*********************/
   	if (printEDs){
-    	PrintEndDevices (endDevices, gateways, endDevFile, gwFile);
+    	PrintEndDevices (endDevices, gateways, endDevRegFile, endDevAlmFile, gwFile); 	
  	}
 
   	////////////////
@@ -457,20 +506,18 @@ int main (int argc, char *argv[]){
   	// Metrics results to file //
   	////////////xx///////////////
   	
+  	LoraPacketTracker &tracker = helper.GetPacketTracker ();
+
 	if (sfQuant[0]){
     	NS_LOG_INFO (endl <<"//////////////////////////////////////////////");
     	NS_LOG_INFO ("//  Computing SF-7 performance metrics  //");
     	NS_LOG_INFO ("//////////////////////////////////////////////" << endl);
 
-  		LoraPacketTracker &tracker = helper.GetPacketTracker ();
+	  	NS_LOG_INFO ("--- Regulars performance metrics ---");
+   	
+		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), REGULAR, (unsigned)nRegulars, (unsigned)nDevices, SF7)) >> sent >> received;
 
-		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), SF7)) >> sent >> received;
-	
-		if(flagRtx)
-    		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
-		else
-			stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF7)) >> avgDelay;
-
+		stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF7)) >> avgDelay;
 	
 		packLoss = sent - received;
   		throughput = received/simulationTime;
@@ -484,9 +531,8 @@ int main (int argc, char *argv[]){
 		NS_LOG_INFO("----------------------------------------------------------------"<< endl);
 
   		myfile.open (fileSF7Metric, ios::out | ios::app);
-  		myfile << nDevices << ", " << throughput << ", " << probSucc << ", " <<  probLoss  << ", " << avgDelay << "\n";
-	  	myfile.close();  
-  
+  		myfile << nDevices << ", " << throughput << ", " << probSucc;
+  	  	myfile.close();  
 
 	   	NS_LOG_INFO("numDev:" << nDevices << " numGW:" << nGateways << " simTime:" << simulationTime << " throughput:" << throughput);
   		NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -496,7 +542,40 @@ int main (int argc, char *argv[]){
  	 	myfile.open (fileData, ios::out | ios::app);
   		myfile << "sent: " << sent << " succ: " << received << " drop: "<< packLoss << "\n";
   		myfile << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << "\n";
-  		myfile << "numDev: " << nDevices << " numGat: " << nGateways << " simTime: " << simulationTime << " throughput: " << throughput<< "\n";
+  		myfile << "numRegDev: " << nRegulars << " numGat: " << nGateways << " simTime: " << simulationTime << " throughput: " << throughput<< "\n";
+  		myfile << "##################################################################" << "\n\n";
+  		myfile.close();  
+
+	  	NS_LOG_INFO ("--- Alarms performance metrics ---");
+   	
+		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), ALARM, (unsigned)nRegulars, (unsigned)nDevices, SF7)) >> sent >> received;
+
+		stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF7)) >> avgDelay;
+	
+		packLoss = sent - received;
+  		throughput = received/simulationTime;
+
+  		probSucc = received/sent;
+  		probLoss = packLoss/sent;
+
+		NS_LOG_INFO("----------------------------------------------------------------");
+   		NS_LOG_INFO("nDevices" << "  |  " << "throughput" << "  |  "  << "probSucc"  << "  |  " << "probLoss" <<  "  |  " << "avgDelay"); 
+   		NS_LOG_INFO(nDevices  << "       |  " << throughput << "    |  " << probSucc << "   |  " << probLoss << "   |  " << avgDelay);
+		NS_LOG_INFO("----------------------------------------------------------------"<< endl);
+
+  		myfile.open (fileSF7Metric, ios::out | ios::app);
+  		myfile << ", " << throughput << ", " << probSucc << "\n";
+  	  	myfile.close();  
+
+	   	NS_LOG_INFO("numDev:" << nDevices << " numGW:" << nGateways << " simTime:" << simulationTime << " throughput:" << throughput);
+  		NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  		NS_LOG_INFO("sent:" << sent << "    succ:" << received << "     drop:"<< packLoss  << "   delay:" << avgDelay);
+ 	 	NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl);
+
+ 	 	myfile.open (fileData, ios::out | ios::app);
+  		myfile << "sent: " << sent << " succ: " << received << " drop: "<< packLoss << "\n";
+  		myfile << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << "\n";
+  		myfile << "numAlmgDev: " << nAlarms << " numGat: " << nGateways << " simTime: " << simulationTime << " throughput: " << throughput<< "\n";
   		myfile << "##################################################################" << "\n\n";
   		myfile.close();  
 
@@ -521,15 +600,11 @@ int main (int argc, char *argv[]){
     	NS_LOG_INFO ("//  Computing SF-8 performance metrics  //");
     	NS_LOG_INFO ("//////////////////////////////////////////////" << endl);
 
-  		LoraPacketTracker &tracker = helper.GetPacketTracker ();
+	  	NS_LOG_INFO ("--- Regulars performance metrics ---");
+   	
+		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), REGULAR, (unsigned)nRegulars, (unsigned)nDevices, SF8)) >> sent >> received;
 
-		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), SF8)) >> sent >> received;
-	
-		if(flagRtx)
-    		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
-		else
-			stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF8)) >> avgDelay;
-
+		stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF8)) >> avgDelay;
 	
 		packLoss = sent - received;
   		throughput = received/simulationTime;
@@ -543,9 +618,8 @@ int main (int argc, char *argv[]){
 		NS_LOG_INFO("----------------------------------------------------------------"<< endl);
 
   		myfile.open (fileSF8Metric, ios::out | ios::app);
-  		myfile << nDevices << ", " << throughput << ", " << probSucc << ", " <<  probLoss  << ", " << avgDelay << "\n";
-	  	myfile.close();  
-  
+  		myfile << nDevices << ", " << throughput << ", " << probSucc;
+  	  	myfile.close();  
 
 	   	NS_LOG_INFO("numDev:" << nDevices << " numGW:" << nGateways << " simTime:" << simulationTime << " throughput:" << throughput);
   		NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -555,7 +629,40 @@ int main (int argc, char *argv[]){
  	 	myfile.open (fileData, ios::out | ios::app);
   		myfile << "sent: " << sent << " succ: " << received << " drop: "<< packLoss << "\n";
   		myfile << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << "\n";
-  		myfile << "numDev: " << nDevices << " numGat: " << nGateways << " simTime: " << simulationTime << " throughput: " << throughput<< "\n";
+  		myfile << "numRegDev: " << nRegulars << " numGat: " << nGateways << " simTime: " << simulationTime << " throughput: " << throughput<< "\n";
+  		myfile << "##################################################################" << "\n\n";
+  		myfile.close();  
+
+	  	NS_LOG_INFO ("--- Alarms performance metrics ---");
+   	
+		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), ALARM, (unsigned)nRegulars, (unsigned)nDevices, SF8)) >> sent >> received;
+
+		stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF8)) >> avgDelay;
+	
+		packLoss = sent - received;
+  		throughput = received/simulationTime;
+
+  		probSucc = received/sent;
+  		probLoss = packLoss/sent;
+
+		NS_LOG_INFO("----------------------------------------------------------------");
+   		NS_LOG_INFO("nDevices" << "  |  " << "throughput" << "  |  "  << "probSucc"  << "  |  " << "probLoss" <<  "  |  " << "avgDelay"); 
+   		NS_LOG_INFO(nDevices  << "       |  " << throughput << "    |  " << probSucc << "   |  " << probLoss << "   |  " << avgDelay);
+		NS_LOG_INFO("----------------------------------------------------------------"<< endl);
+
+  		myfile.open (fileSF8Metric, ios::out | ios::app);
+  		myfile << ", " << throughput << ", " << probSucc << "\n";
+  	  	myfile.close();  
+
+	   	NS_LOG_INFO("numDev:" << nDevices << " numGW:" << nGateways << " simTime:" << simulationTime << " throughput:" << throughput);
+  		NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  		NS_LOG_INFO("sent:" << sent << "    succ:" << received << "     drop:"<< packLoss  << "   delay:" << avgDelay);
+ 	 	NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl);
+
+ 	 	myfile.open (fileData, ios::out | ios::app);
+  		myfile << "sent: " << sent << " succ: " << received << " drop: "<< packLoss << "\n";
+  		myfile << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << "\n";
+  		myfile << "numAlmgDev: " << nAlarms << " numGat: " << nGateways << " simTime: " << simulationTime << " throughput: " << throughput<< "\n";
   		myfile << "##################################################################" << "\n\n";
   		myfile.close();  
 
@@ -580,15 +687,11 @@ int main (int argc, char *argv[]){
     	NS_LOG_INFO ("//  Computing SF-9 performance metrics  //");
     	NS_LOG_INFO ("//////////////////////////////////////////////" << endl);
 
-  		LoraPacketTracker &tracker = helper.GetPacketTracker ();
+	  	NS_LOG_INFO ("--- Regulars performance metrics ---");
+   	
+		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), REGULAR, (unsigned)nRegulars, (unsigned)nDevices, SF9)) >> sent >> received;
 
-		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), SF9)) >> sent >> received;
-	
-		if(flagRtx)
-    		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
-		else
-			stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF9)) >> avgDelay;
-
+		stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF9)) >> avgDelay;
 	
 		packLoss = sent - received;
   		throughput = received/simulationTime;
@@ -602,9 +705,8 @@ int main (int argc, char *argv[]){
 		NS_LOG_INFO("----------------------------------------------------------------"<< endl);
 
   		myfile.open (fileSF9Metric, ios::out | ios::app);
-  		myfile << nDevices << ", " << throughput << ", " << probSucc << ", " <<  probLoss  << ", " << avgDelay << "\n";
-	  	myfile.close();  
-  
+  		myfile << nDevices << ", " << throughput << ", " << probSucc;
+  	  	myfile.close();  
 
 	   	NS_LOG_INFO("numDev:" << nDevices << " numGW:" << nGateways << " simTime:" << simulationTime << " throughput:" << throughput);
   		NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -614,7 +716,40 @@ int main (int argc, char *argv[]){
  	 	myfile.open (fileData, ios::out | ios::app);
   		myfile << "sent: " << sent << " succ: " << received << " drop: "<< packLoss << "\n";
   		myfile << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << "\n";
-  		myfile << "numDev: " << nDevices << " numGat: " << nGateways << " simTime: " << simulationTime << " throughput: " << throughput<< "\n";
+  		myfile << "numRegDev: " << nRegulars << " numGat: " << nGateways << " simTime: " << simulationTime << " throughput: " << throughput<< "\n";
+  		myfile << "##################################################################" << "\n\n";
+  		myfile.close();  
+
+	  	NS_LOG_INFO ("--- Alarms performance metrics ---");
+   	
+		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), ALARM, (unsigned)nRegulars, (unsigned)nDevices, SF9)) >> sent >> received;
+
+		stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF9)) >> avgDelay;
+	
+		packLoss = sent - received;
+  		throughput = received/simulationTime;
+
+  		probSucc = received/sent;
+  		probLoss = packLoss/sent;
+
+		NS_LOG_INFO("----------------------------------------------------------------");
+   		NS_LOG_INFO("nDevices" << "  |  " << "throughput" << "  |  "  << "probSucc"  << "  |  " << "probLoss" <<  "  |  " << "avgDelay"); 
+   		NS_LOG_INFO(nDevices  << "       |  " << throughput << "    |  " << probSucc << "   |  " << probLoss << "   |  " << avgDelay);
+		NS_LOG_INFO("----------------------------------------------------------------"<< endl);
+
+  		myfile.open (fileSF9Metric, ios::out | ios::app);
+  		myfile << ", " << throughput << ", " << probSucc << "\n";
+  	  	myfile.close();  
+
+	   	NS_LOG_INFO("numDev:" << nDevices << " numGW:" << nGateways << " simTime:" << simulationTime << " throughput:" << throughput);
+  		NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  		NS_LOG_INFO("sent:" << sent << "    succ:" << received << "     drop:"<< packLoss  << "   delay:" << avgDelay);
+ 	 	NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl);
+
+ 	 	myfile.open (fileData, ios::out | ios::app);
+  		myfile << "sent: " << sent << " succ: " << received << " drop: "<< packLoss << "\n";
+  		myfile << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << "\n";
+  		myfile << "numAlmgDev: " << nAlarms << " numGat: " << nGateways << " simTime: " << simulationTime << " throughput: " << throughput<< "\n";
   		myfile << "##################################################################" << "\n\n";
   		myfile.close();  
 

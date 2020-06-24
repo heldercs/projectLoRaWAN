@@ -530,32 +530,32 @@ LorawanMacHelper::SetSpreadingFactorsEIB (NodeContainer endDevices, double rad)
 	   
 	  pos = sqrt(pow(position->GetPosition().x, 2) + pow(position->GetPosition().y, 2));
 
-      if (pos < threshold)
+      if (pos <= threshold)
         {
           mac->SetDataRate (5);
           sfQuantity[0] = sfQuantity[0] + 1;
         }
-      else if (pos < 2*threshold)
+      else if (pos <= 2*threshold)
         {
           mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
         }
-      else if (pos < 3*threshold)
+      else if (pos <= 3*threshold)
         {
           mac->SetDataRate (3);
           sfQuantity[2] = sfQuantity[2] + 1;
         }
-      else if (pos < 4*threshold)
+      else if (pos <= 4*threshold)
         {
           mac->SetDataRate (2);
           sfQuantity[3] = sfQuantity[3] + 1;
         }
-      else if (pos < 5*threshold)
+      else if (pos <= 5*threshold)
         {
           mac->SetDataRate (1);
           sfQuantity[4] = sfQuantity[4] + 1;
         }
-      else if (pos < 6*threshold)
+      else if (pos <= 6*threshold)
         {
           mac->SetDataRate (0);
           sfQuantity[5] = sfQuantity[5] + 1;
@@ -594,17 +594,17 @@ LorawanMacHelper::SetSpreadingFactorsEAB (NodeContainer endDevices, double rad)
 	   
 	  pos = sqrt(pow(position->GetPosition().x, 2) + pow(position->GetPosition().y, 2));
 
-      if (pos < rad/sqrt(3))
+      if (pos <= rad/sqrt(3))
         {
           mac->SetDataRate (5);
           sfQuantity[0] = sfQuantity[0] + 1;
         }
-      else if (pos < (sqrt(2)*rad/sqrt(3)))
+      else if (pos <= (sqrt(2)*rad/sqrt(3)))
         {
           mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
         }
-      else if (pos < (sqrt(3)*rad/sqrt(3)))
+      else if (pos <= (sqrt(3)*rad/sqrt(3)))
         {
           mac->SetDataRate (3);
           sfQuantity[2] = sfQuantity[2] + 1;
