@@ -55,7 +55,7 @@ then
 	touch ./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt
 	file2="./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt"
 
-	for numSta in 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 #200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 
+	for numSta in 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400 
 	do
 			echo "trial:$trial-numSTA:$numSta #"
 
@@ -93,7 +93,7 @@ then
 	file4="./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt"
 
 
-	for numSta in 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 #200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 
+	for numSta in 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400
 	do
 			echo "trial:$trial-numSTA:$numSta #"
 
@@ -112,8 +112,9 @@ then
   			./waf --run "lorawan-network-mClass-sim --nSeed=$numSeed --nDevices=$numSta --nGateways=$gwRing --radius=$rad --gatewayRadius=$gwRad --simulationTime=$simTime --appPeriod=$interval --file1=$file1 --file2=$file2 --file3=$file3 --file4=$file4 --printEDs=$pEDs --trial=$trial" > ./TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/record-$numSta.txt 2>&1
 		done
 	done
-else
-	
+elif [ $1 -eq 2 ]
+then
+
 	touch ./TestResult/test$trial/traffic-$interval/result-regSTAs.dat
 	file1="./TestResult/test$trial/traffic-$interval/result-regSTAs.dat"
 	echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-regSTAs.dat 
@@ -128,7 +129,7 @@ else
 	touch ./TestResult/test$trial/traffic-$interval/mac-almSTAs-GW-$gwRing.txt
 	file4="./TestResult/test$trial/traffic-$interval/mac-almSTAs-GW-$gwRing.txt"
 
-	for numSta in 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000
+	for numSta in 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400
 	do
 			echo "trial:$trial-numSTA:$numSta"
 
@@ -147,6 +148,45 @@ else
   			./waf --run "lorawan-network-wAlm-sim --nSeed=$numSeed --nDevices=$numSta --nGateways=$gwRing --radius=$rad --gatewayRadius=$gwRad --simulationTime=$simTime --appPeriod=$interval --file1=$file1 --file2=$file2 --file3=$file3 --file4=$file4 --printEDs=$pEDs --trial=$trial"  > ./TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/record-$numSta.txt 2>&1
 		done
 	done
+else
+
+	touch ./TestResult/test$trial/traffic-$interval/result-STAs-SF7.dat
+	file1="./TestResult/test$trial/traffic-$interval/result-STAs-SF7.dat"
+	echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-STAs-SF7.dat 
+		
+	touch ./TestResult/test$trial/traffic-$interval/result-STAs-SF8.dat
+	file2="./TestResult/test$trial/traffic-$interval/result-STAs-SF8.dat"
+	echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-STAs-SF8.dat 
+	
+	touch ./TestResult/test$trial/traffic-$interval/result-STAs-SF9.dat
+	file3="./TestResult/test$trial/traffic-$interval/result-STAs-SF9.dat"
+	echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-STAs-SF9.dat 	
+
+	touch ./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt
+	file4="./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt"
+
+
+	for numSta in 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400
+	do
+			echo "trial:$trial-numSTA:$numSta #"
+
+			if [ ! -d TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/ ]
+			then
+				mkdir TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/
+			fi
+
+			touch TestResult/test$trial/time-record$numSta.txt
+
+			echo "Time: $(date) $interval $numSta" >> TestResult/test$trial/time-record$numSta.txt
+
+		for numSeed in {1..5}
+		do
+			echo -ne "$numSeed \r"
+  			./waf --run "lorawan-network-wAlm-mClass-sim --nSeed=$numSeed --nDevices=$numSta --nGateways=$gwRing --radius=$rad --gatewayRadius=$gwRad --simulationTime=$simTime --appPeriod=$interval --file1=$file1 --file2=$file2 --file3=$file3 --file4=$file4 --printEDs=$pEDs --trial=$trial" > ./TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/record-$numSta.txt 2>&1
+		done
+	done
+
+
 fi
 echo "##### Simulation finish #####"
 #echo "seinding email..."
