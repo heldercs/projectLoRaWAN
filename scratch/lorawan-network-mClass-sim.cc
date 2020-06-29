@@ -164,7 +164,43 @@ void buildingHandler ( NodeContainer endDevices, NodeContainer gateways ){
     }
 
 }/* -----  end of function buildingHandler  ----- */
+ 
 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getPacketSizeFromSF
+ *  Description:  
+ * =====================================================================================
+ */
+uint8_t getPacketSizeFromSF (NodeContainer endDevices, int j, bool pDiff){
+
+	uint8_t size = 90, sf=0;
+
+	Ptr<Node> object = endDevices.Get(j);
+    Ptr<NetDevice> netDevice = object->GetDevice (0);
+    Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+    NS_ASSERT (loraNetDevice != 0);
+    Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+	sf = mac->GetSfFromDataRate(mac->GetDataRate ());
+
+	if (pDiff){
+			switch ( sf ) {
+					case SF7:
+							size = 90;
+							break;
+					case SF8:
+							size = 35;
+							break;
+					case SF9:
+							size = 5;
+							break;
+					default:	
+							break;
+			}/* -----  end switch  ----- */
+	}
+	
+	return(size);
+}/* -----  end of function getRateSF  ----- */
 
 int main (int argc, char *argv[]){
 
@@ -174,7 +210,7 @@ int main (int argc, char *argv[]){
  	string fileData="./scratch/mac-STAs-GW-1.txt";
 	string endDevFile="./TestResult/test";
 	string gwFile="./TestResult/test";
-	bool flagRtx=0;
+	bool flagRtx=0, sizeStatus=1;
   	uint32_t nSeed=1;
 	int trial=1; //, numRTX=0;
 	vector<int> sfQuant(6,0);
@@ -305,7 +341,7 @@ int main (int argc, char *argv[]){
 
   	// Assign a mobility model to each node
   	mobility.Install (endDevices);
-  	//int x =5000.00, y= 0;
+  	//int x =4400.00, y= 0;
   	// Make it so that nodes are at a certain height > 0
   	for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j){
       	Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel> ();
@@ -408,8 +444,14 @@ int main (int argc, char *argv[]){
   	Time appStopTime = Seconds (simulationTime);
   	PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
   	appHelper.SetPeriod (Seconds (appPeriodSeconds));
-  	appHelper.SetPacketSize (19);
-  	ApplicationContainer appContainer = appHelper.Install (endDevices);
+
+	appHelper.SetPacketSize (getPacketSizeFromSF (endDevices, 0, sizeStatus));
+  	ApplicationContainer appContainer = appHelper.Install (endDevices.Get(0));
+	for(int j = 1; j < nDevices; j++){
+		appHelper.SetPacketSize (getPacketSizeFromSF (endDevices, j, sizeStatus));
+		appContainer.Add(appHelper.Install(endDevices.Get(j)));
+	}
+
  
 /*	RandomSenderHelper appHelper = RandomSenderHelper ();
   	appHelper.SetMean (appPeriodSeconds);
