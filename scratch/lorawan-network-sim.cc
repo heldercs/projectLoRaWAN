@@ -392,7 +392,7 @@ int main (int argc, char *argv[]){
 	for (int i=0; i< 6;i++)	
 		cout << "  " << sfQuant.at(i);
 	cout << endl;
- */
+*/
 
   	NS_LOG_DEBUG ("Completed configuration");
 
@@ -401,16 +401,16 @@ int main (int argc, char *argv[]){
    	*********************************************/
 
   	Time appStopTime = Seconds (simulationTime);
-   	PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
-  	appHelper.SetPeriod (Seconds (appPeriodSeconds));
-  	appHelper.SetPacketSize (90);
-  	ApplicationContainer appContainer = appHelper.Install (endDevices);
+   	//PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
+  	//appHelper.SetPeriod (Seconds (appPeriodSeconds));
+  	//appHelper.SetPacketSize (90);
+  	//ApplicationContainer appContainer = appHelper.Install (endDevices);
   
-/*  	RandomSenderHelper appHelper = RandomSenderHelper ();
+  	RandomSenderHelper appHelper = RandomSenderHelper ();
   	appHelper.SetMean (appPeriodSeconds);
-   	appHelper.SetPacketSize (19);
+   	appHelper.SetPacketSize (90);
   	ApplicationContainer appContainer = appHelper.Install (endDevices);
-*/
+
   	appContainer.Start (Seconds (0));
   	appContainer.Stop (appStopTime);
 

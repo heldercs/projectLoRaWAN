@@ -6,17 +6,17 @@ reset
 set term postscript eps color blacktext "Times-Roman-Bold" 16
 set grid
 #set key box lt -1 lw 2
-set xrange [0:2400]
-set xtics 300 font "Times-Roman-Bold,18"
+set xrange [0:1000]
+set xtics 100 font "Times-Roman-Bold,18"
 set yrange [0.01:1]
 set ytics font "times-Roman-bold,18"
 set ylabel "Packet Success Probability (%)" font "Times-Roman-Bold,20"
 set xlabel "# endNodes" font "times-Roman-Bold,20"
-set output './TestResult/probSuccess_multClass-EAB.eps'
+set output './TestResult/probSuccess_multClass.eps'
 #set key bottom
 set key reverse vertical right
 set format y "10^{%L}"
-set grid ytics
+set grid ytics mytics
 set logscale y 10
 
 # line styles
@@ -35,21 +35,23 @@ set style line 10 lt 2 lc rgb '#000000' lw 3 # black
 #set multiplot
 
 # Filename of the data
-#filename='./TestResult/result-math-SF789.dat'
-#filename1='./TestResult/result-sim-SF789.dat'
-#filename2='./TestResult/result-math-SF789_EAB.dat'
-#filename3='./TestResult/result-sim-SF789_EAB.dat'
-#filename4='./TestResult/result-math-SF7.dat'
-#filename3='./TestResult/result-sim-SF7.dat'
-#filename4='./TestResult/result-multClass_2_2-SF8.dat'
+filename='./TestResult/result-math-SF789.dat'
+filename1='./TestResult/result-math-SF789_EAB.dat'
+filename2='./TestResult/result-math-SF7.dat'
+filename3='./TestResult/result-sim-SF789.dat'
+filename4='./TestResult/result-sim-SF789_EAB.dat'
+filename5='./TestResult/result-sim-SF7.dat'
+#filename6='./TestResult/result-sim-SF789_EAB.dat'
 #filename5='./TestResult/result-multClass_2_2-SF9.dat'
 #filename='~/Doutorado/projectLoRa/result-math-SF789.dat'
 #filename1='~/Doutorado/projectLoRa/result-sim-SF789.dat'
-filename='~/Doutorado/projectLoRa/result-math-SF789_EAB.dat'
-filename1='~/Doutorado/projectLoRa/result-sim-SF789_EAB.dat'
+#filename='~/Doutorado/projectLoRa/result-math-SF789_EAB.dat'
+#filename1='~/Doutorado/projectLoRa/result-sim-SF789_EAB.dat'
 
 # Plot the data
-plot filename using 1:2 w l ls 1 t 'SF = 7', filename1 using 1:2 ls 7 notitle, filename using 1:3 w l ls 2 t 'SF = 8', filename1 using 1:3 ls 8 notitle, filename using 1:4 w l ls 3 t 'SF = 9', filename1 using 1:4 ls 9 notitle, filename using 1:5 w l ls 5 t 'average', filename1 using 1:5 ls 10 notitle 
+plot filename2 using 1:2 w l ls 1 t 'SF7', filename5 using 1:2 ls 7 notitle
+#plot filename using 1:2 w l ls 1 t 'SF7', filename2 using 1:2 ls 7 notitle, filename using 1:3 w l ls 2 t 'SF8', filename2 using 1:3 ls 8 notitle, filename using 1:4 w l ls 3 t 'SF9', filename2 using 1:4 ls 9 notitle
+#, filename1 using 1:4 ls 9 notitle, filename using 1:5 w l ls 5 t 'average', filename1 using 1:5 ls 10 notitle 
 
 #plot filename using 1:2 w l ls 1 t 'SF = 7', filename using 1:3 w l ls 2 t 'SF = 8', filename using 1:4 w l ls 3 t 'SF = 9', filename using 1:5 w l ls 4 t 'average', filename3 using 1:2 w l ls 5 t 'only SF = 7'
 #plot filename using 1:5 w l ls 1 t 'avg SF789', filename1 using 1:5 w l ls 2 t 'avg SF789-Size', filename2 using 1:5 w l ls 3 t 'avg SF789-EAB', filename3 using 1:5 w l ls 4 t 'avg SF789-EAB-Size', filename4 using 1:2 w l ls 6 t 'only SF = 7'

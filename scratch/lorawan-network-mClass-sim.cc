@@ -210,7 +210,7 @@ int main (int argc, char *argv[]){
  	string fileData="./scratch/mac-STAs-GW-1.txt";
 	string endDevFile="./TestResult/test";
 	string gwFile="./TestResult/test";
-	bool flagRtx=0, sizeStatus=1;
+	bool flagRtx=0, sizeStatus=0;
   	uint32_t nSeed=1;
 	int trial=1; //, numRTX=0;
 	vector<int> sfQuant(6,0);
@@ -341,7 +341,7 @@ int main (int argc, char *argv[]){
 
   	// Assign a mobility model to each node
   	mobility.Install (endDevices);
-  	//int x =4400.00, y= 0;
+  	//int x =5000.00, y= 0;
   	// Make it so that nodes are at a certain height > 0
   	for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j){
       	Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel> ();
@@ -429,7 +429,7 @@ int main (int argc, char *argv[]){
 	//sfQuant = macHelper.SetSpreadingFactorsWeights (endDevices, (unsigned)nDevices);
 
 
-/*  	cout << "SFs: ";
+/*    	cout << "SFs: ";
 	for (int i=0; i< 6;i++)	
 		cout << "  " << sfQuant.at(i);
 	cout << endl;
@@ -442,22 +442,27 @@ int main (int argc, char *argv[]){
    	*********************************************/
 
   	Time appStopTime = Seconds (simulationTime);
-  	PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
-  	appHelper.SetPeriod (Seconds (appPeriodSeconds));
+ 
+ 	/*  PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
+  	appHelper.SetPeriod (Seconds (appPeriodSeconds));	
+	appHelper.SetPacketSize (getPacketSizeFromSF (endDevices, 0, sizeStatus));
+  	ApplicationContainer appContainer = appHelper.Install (endDevices.Get(0));
+	for(int j = 1; j < nDevices; j++){
+		appHelper.SetPacketSize (getPacketSizeFromSF (endDevices, j, sizeStatus));
+		appContainer.Add(appHelper.Install(endDevices.Get(j)));
+	}*/
 
+ 
+	RandomSenderHelper appHelper = RandomSenderHelper ();
+  	appHelper.SetMean (appPeriodSeconds);
 	appHelper.SetPacketSize (getPacketSizeFromSF (endDevices, 0, sizeStatus));
   	ApplicationContainer appContainer = appHelper.Install (endDevices.Get(0));
 	for(int j = 1; j < nDevices; j++){
 		appHelper.SetPacketSize (getPacketSizeFromSF (endDevices, j, sizeStatus));
 		appContainer.Add(appHelper.Install(endDevices.Get(j)));
 	}
+	
 
- 
-/*	RandomSenderHelper appHelper = RandomSenderHelper ();
-  	appHelper.SetMean (appPeriodSeconds);
-   	appHelper.SetPacketSize (19);
-  	ApplicationContainer appContainer = appHelper.Install (endDevices);
-*/
   	appContainer.Start (Seconds (0));
   	appContainer.Stop (appStopTime);
 
