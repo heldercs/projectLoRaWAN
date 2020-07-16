@@ -300,7 +300,7 @@ int main (int argc, char *argv[]){
 
   	// Assign a mobility model to each node
   	mobility.Install (endDevices);
-  	//int x =5300.00, y= 0;
+  	//int x =5000.00, y= 0;
   	// Make it so that nodes are at a certain height > 0
   	for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j){
       	Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel> ();
@@ -408,7 +408,7 @@ int main (int argc, char *argv[]){
   
   	RandomSenderHelper appHelper = RandomSenderHelper ();
   	appHelper.SetMean (appPeriodSeconds);
-   	appHelper.SetPacketSize (90);
+   	appHelper.SetPacketSize (19);
   	ApplicationContainer appContainer = appHelper.Install (endDevices);
 
   	appContainer.Start (Seconds (0));

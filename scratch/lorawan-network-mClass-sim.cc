@@ -53,7 +53,7 @@ NS_LOG_COMPONENT_DEFINE ("LorawanNetworkSimulator");
 // Network settings
 int nDevices = 200;
 int nGateways = 1;
-double radius = 7500;
+double radius = 5600;
 double gatewayRadius = 0;
 double simulationTime = 600;
 
@@ -202,6 +202,40 @@ uint8_t getPacketSizeFromSF (NodeContainer endDevices, int j, bool pDiff){
 	return(size);
 }/* -----  end of function getRateSF  ----- */
 
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getShiftPosition
+ *  Description:  
+ * =====================================================================================
+ */
+Vector getShiftPosition (NodeContainer endDevices, int j, int base){
+
+	double radius=0, co=0, si=0;	
+	Ptr<Node> object = endDevices.Get(j);
+    Ptr<MobilityModel> mobility = object->GetObject<MobilityModel> ();
+    NS_ASSERT (mobility != 0);
+    Vector position = mobility->GetPosition ();
+
+	cout << "x: " << position.x << " y: " << position.y <<endl;
+	cout << "mod: " << (int)position.x/base << " mod: " << (int)position.y/base <<endl;
+
+	radius = sqrt(pow(position.x, 2) + pow(position.y, 2));
+	co = position.x/radius;
+	si = position.y/radius;
+	
+	radius += base - (int)radius/700*700;
+	position.x = radius*co;
+	position.y = radius*si;
+
+    cout << "x: " << position.x << " y: " << position.y <<endl;
+	cout << sqrt(pow(position.x, 2) + pow(position.y, 2)) << endl;
+	cout << endl;
+
+	return(position);
+}/* -----  end of function getRateSF  ----- */
+
+
 int main (int argc, char *argv[]){
 
 	string fileSF7Metric="./scratch/result-STAs.dat";
@@ -210,12 +244,12 @@ int main (int argc, char *argv[]){
  	string fileData="./scratch/mac-STAs-GW-1.txt";
 	string endDevFile="./TestResult/test";
 	string gwFile="./TestResult/test";
-	bool flagRtx=0, sizeStatus=0;
+	bool flagRtx=0; //, sizeStatus=0;
   	uint32_t nSeed=1;
-	int trial=1; //, numRTX=0;
+	int trial=1; //, nCount=0, nClass1=0, nClass2=0, nClass3=0;
 	vector<int> sfQuant(6,0);
 	double packLoss=0, sent=0, received=0, avgDelay=0;
-	double angle=0, sAngle=M_PI;
+	double angle=0, sAngle=M_PI; //, radius1=4200; //, radius2=4900;
 	double throughput=0, probSucc=0, probLoss=0;
 
 	CommandLine cmd;
@@ -237,6 +271,7 @@ int main (int argc, char *argv[]){
 	endDevFile += to_string(trial) + "/endDevices" + to_string(nDevices) + ".dat";
 	gwFile += to_string(trial) + "/GWs" + to_string(nGateways) + ".dat";
 
+	
   	// Set up logging
   	// LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraPacketTracker", LOG_LEVEL_ALL);
@@ -346,13 +381,11 @@ int main (int argc, char *argv[]){
   	for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j){
       	Ptr<MobilityModel> mobility = (*j)->GetObject<MobilityModel> ();
       	Vector position = mobility->GetPosition ();
-	  	//position.x = x;
-		//position.y = y;
-      	position.z = 1.2;
+		//position.x = 100;
+		//position.y = 100;	
+ 		position.z = 1.2;
       	mobility->SetPosition (position);
-		//x +=2500;
-    }
-
+	}
 
   	// Create the LoraNetDevices of the end devices
   	uint8_t nwkId = 54;
@@ -426,8 +459,8 @@ int main (int argc, char *argv[]){
   	sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
 	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
 	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
-	//sfQuant = macHelper.SetSpreadingFactorsWeights (endDevices, (unsigned)nDevices);
-
+	//sfQuant = macHelper.SetSpreadingFactorsProp (endDevices, 0.80, 0.18, radius);
+	//sfQuant = macHelper.SetSpreadingFactorsStrategies (endDevices, sfQuant, 0.80*nDevices, 0.18*nDevices, nDevices, LorawanMacHelper::CLASS_THREE);
 
 /*    	cout << "SFs: ";
 	for (int i=0; i< 6;i++)	
@@ -445,22 +478,15 @@ int main (int argc, char *argv[]){
  
  	/*  PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
   	appHelper.SetPeriod (Seconds (appPeriodSeconds));	
-	appHelper.SetPacketSize (getPacketSizeFromSF (endDevices, 0, sizeStatus));
-  	ApplicationContainer appContainer = appHelper.Install (endDevices.Get(0));
-	for(int j = 1; j < nDevices; j++){
-		appHelper.SetPacketSize (getPacketSizeFromSF (endDevices, j, sizeStatus));
-		appContainer.Add(appHelper.Install(endDevices.Get(j)));
-	}*/
+	appHelper.SetPacketSize (19);
+  	ApplicationContainer appContainer = appHelper.Install (endDevices);
+	*/
 
  
 	RandomSenderHelper appHelper = RandomSenderHelper ();
   	appHelper.SetMean (appPeriodSeconds);
-	appHelper.SetPacketSize (getPacketSizeFromSF (endDevices, 0, sizeStatus));
-  	ApplicationContainer appContainer = appHelper.Install (endDevices.Get(0));
-	for(int j = 1; j < nDevices; j++){
-		appHelper.SetPacketSize (getPacketSizeFromSF (endDevices, j, sizeStatus));
-		appContainer.Add(appHelper.Install(endDevices.Get(j)));
-	}
+	appHelper.SetPacketSize (19);
+  	ApplicationContainer appContainer = appHelper.Install (endDevices);
 	
 
   	appContainer.Start (Seconds (0));

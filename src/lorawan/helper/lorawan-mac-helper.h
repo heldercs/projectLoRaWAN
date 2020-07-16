@@ -50,7 +50,7 @@ public:
   /**
    * Define the operational region.
    */
-  enum StrategieSF { SHIFT_ONE, SHIFT_TWO, RESERVE };
+  enum StrategieSF { SHIFT_ONE, SHIFT_TWO, CLASS_TWO, CLASS_THREE, SERVE };
 
   /**
    * Create a mac helper without any parameter set. The user must set
@@ -110,9 +110,9 @@ public:
   static std::vector<int> SetSpreadingFactorsEAB (NodeContainer endDevices, double rad);
 
   static std::vector<int> SetSpreadingFactorsStrategies (NodeContainer endDevices, std::vector<int> sfQuantity, 
-														 uint32_t edge, uint32_t nDev, 
+														 uint32_t edge, uint32_t edge2, uint32_t nDev, 
 														 uint8_t mode);
-  static std::vector<int> SetSpreadingFactorsProp (NodeContainer endDevices, double rad);
+  static std::vector<int> SetSpreadingFactorsProp (NodeContainer endDevices, double prop1, double prop2, double rad);
 
   /**
    * Set up the end device's data rates according to the given distribution.

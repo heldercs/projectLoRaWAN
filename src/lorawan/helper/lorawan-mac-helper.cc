@@ -599,12 +599,12 @@ LorawanMacHelper::SetSpreadingFactorsEAB (NodeContainer endDevices, double rad)
           mac->SetDataRate (5);
           sfQuantity[0] = sfQuantity[0] + 1;
         }
-      else if (pos <= (sqrt(2)*rad/sqrt(3)))
+      else if (pos <= sqrt(2)*rad/sqrt(3))
         {
           mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
         }
-      else if (pos <= (sqrt(3)*rad/sqrt(3)))
+      else if (pos <= sqrt(3)*rad/sqrt(3))
         {
           mac->SetDataRate (3);
           sfQuantity[2] = sfQuantity[2] + 1;
@@ -640,7 +640,7 @@ LorawanMacHelper::SetSpreadingFactorsEAB (NodeContainer endDevices, double rad)
 
 std::vector<int>
 LorawanMacHelper::SetSpreadingFactorsStrategies (NodeContainer endDevices, std::vector<int> sfQuantity, 
-												 uint32_t edge, uint32_t nDev, uint8_t mode)
+												 uint32_t edge, uint32_t edge2, uint32_t nDev, uint8_t mode)
 {
   NS_LOG_FUNCTION_NOARGS ();
 		uint8_t drAlm = 1;
@@ -686,6 +686,68 @@ LorawanMacHelper::SetSpreadingFactorsStrategies (NodeContainer endDevices, std::
 						}
 					}			
 					break;
+				case CLASS_TWO:
+					{
+						//std::cout << "edge: " << (unsigned)edge << std::endl;	
+						for (uint32_t  j = 0; j < edge; ++j){
+							Ptr<Node> object = endDevices.Get(j);
+    						Ptr<NetDevice> netDevice = object->GetDevice (0);
+      						Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      						NS_ASSERT (loraNetDevice != 0);
+      						Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      						NS_ASSERT (mac != 0);
+							sfQuantity[0]++;
+							mac->SetDataRate(5);
+						}
+	
+						for (uint32_t  j = edge; j < nDev; ++j){
+							Ptr<Node> object = endDevices.Get(j);
+    						Ptr<NetDevice> netDevice = object->GetDevice (0);
+      						Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      						NS_ASSERT (loraNetDevice != 0);
+      						Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      						NS_ASSERT (mac != 0);
+							sfQuantity[1]++;
+							mac->SetDataRate(4);
+						}
+					}			
+					break;
+				case CLASS_THREE:
+					{
+						//std::cout << "edge: " << (unsigned)edge << " e2: " << edge2 << std::endl;	
+						for (uint32_t  j = 0; j < edge; ++j){
+							Ptr<Node> object = endDevices.Get(j);
+    						Ptr<NetDevice> netDevice = object->GetDevice (0);
+      						Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      						NS_ASSERT (loraNetDevice != 0);
+      						Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      						NS_ASSERT (mac != 0);
+							sfQuantity[0]++;
+							mac->SetDataRate(5);
+						}
+	
+						for (uint32_t  j = edge; j < edge+edge2; ++j){
+							Ptr<Node> object = endDevices.Get(j);
+    						Ptr<NetDevice> netDevice = object->GetDevice (0);
+      						Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      						NS_ASSERT (loraNetDevice != 0);
+      						Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      						NS_ASSERT (mac != 0);
+							sfQuantity[1]++;
+							mac->SetDataRate(4);
+						}
+	
+						for (uint32_t  j = edge+edge2; j < nDev; ++j){
+							Ptr<Node> object = endDevices.Get(j);
+    						Ptr<NetDevice> netDevice = object->GetDevice (0);
+      						Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      						NS_ASSERT (loraNetDevice != 0);
+      						Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      						NS_ASSERT (mac != 0);
+							sfQuantity[2]++;
+							mac->SetDataRate(3);
+						}
+					}			
 				default:
 					break;
 		}				/* -----  end switch  ----- */
@@ -695,7 +757,7 @@ LorawanMacHelper::SetSpreadingFactorsStrategies (NodeContainer endDevices, std::
 }
 
 std::vector<int>
-LorawanMacHelper::SetSpreadingFactorsProp (NodeContainer endDevices, double rad)
+LorawanMacHelper::SetSpreadingFactorsProp (NodeContainer endDevices, double prop1, double prop2, double rad)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -714,37 +776,23 @@ LorawanMacHelper::SetSpreadingFactorsProp (NodeContainer endDevices, double rad)
 	   
 	  pos = sqrt(pow(position->GetPosition().x, 2) + pow(position->GetPosition().y, 2));
 
-      if (pos <= 0.75*rad)
+	if (prop2){
+		if (pos <= sqrt(prop1)*rad)
         {
-          mac->SetDataRate (5);
-          sfQuantity[0] = sfQuantity[0] + 1;
+        	  mac->SetDataRate (5);
+         	 sfQuantity[0] = sfQuantity[0] + 1;
         }
-      else if (pos <= 0.875*rad)
+      	else if (pos <= sqrt(prop1+prop2)*rad)
         {
           mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
         }
-      else if (pos <= rad)
+     	else if (pos <= rad)
         {
       	  mac->SetDataRate (3);
           sfQuantity[2] = sfQuantity[2] + 1;
         }
-/*      else if (pos < (sqrt(4)*rad/sqrt(6)))
-        {
-          mac->SetDataRate (2);
-          sfQuantity[3] = sfQuantity[3] + 1;
-        }
-      else if (pos < (sqrt(5)*rad/sqrt(6)))
-        {
-          mac->SetDataRate (1);
-          sfQuantity[4] = sfQuantity[4] + 1;
-        }
-      else if (pos < rad)
-        {
-          mac->SetDataRate (0);
-          sfQuantity[5] = sfQuantity[5] + 1;
-        }*/
-      else // Device is out of range. Assign SF12.
+    	 else // Device is out of range. Assign SF12.
         {
           // NS_LOG_DEBUG ("Device out of range");
           mac->SetDataRate (3);
@@ -752,7 +800,28 @@ LorawanMacHelper::SetSpreadingFactorsProp (NodeContainer endDevices, double rad)
           // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
         }
 
-    } // end loop on nodes
+	}else{
+		if (pos <= sqrt(prop1)*rad)
+        {
+        	  mac->SetDataRate (5);
+         	 sfQuantity[0] = sfQuantity[0] + 1;
+        }
+     	else if (pos <= rad)
+        {
+      	  mac->SetDataRate (4);
+          sfQuantity[1] = sfQuantity[1] + 1;
+        }
+    	 else // Device is out of range. Assign SF12.
+        {
+          // NS_LOG_DEBUG ("Device out of range");
+          mac->SetDataRate (4);
+          sfQuantity[1] = sfQuantity[1] + 1;
+          // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
+        }
+
+	}
+ 
+  } // end loop on nodes
 
   return(sfQuantity);
 

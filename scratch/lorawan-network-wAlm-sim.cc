@@ -319,7 +319,7 @@ int main (int argc, char *argv[]){
 	}
 */
 
-	nRegulars = 1000;
+	nRegulars = 100;
 	nAlarms = nDevices - nRegulars;
 
 	NS_LOG_DEBUG("number regular event: " << nRegulars << "number alarm event: " << nAlarms );
@@ -330,7 +330,7 @@ int main (int argc, char *argv[]){
 	gwFile += to_string(trial) + "/GWs" + to_string(nGateways) + ".dat";
 
   	// Set up logging
-  	// LogComponentEnable ("LorawanNetworkWithAlmSimulator", LOG_LEVEL_ALL);
+  	 LogComponentEnable ("LorawanNetworkWithAlmSimulator", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraPacketTracker", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraChannel", LOG_LEVEL_INFO);
   	// LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
