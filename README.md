@@ -60,7 +60,7 @@ in which the above parameters are defined as:
 * trial    - The results directory; 
 * pED      - Whether or not to print a file containing the ED's positions;
 ```
-Applications Options:
+Applications Options (App):
 ```
 * 0      - lorawan Application base 
 * 1      - lorawan Application multiClass
