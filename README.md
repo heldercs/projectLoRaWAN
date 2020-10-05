@@ -45,12 +45,13 @@ These tests are run in parallel by Waf. You should eventually see a report sayin
 ```
 ### Running the Script ###
 
-We typically run scripts under the control of Waf. This allows the build system to ensure that the shared library paths are set correctly and that the libraries are available at run time. To run the LoRa program, simply to run the runSimulator shell script by typing the following:
+We typically run scripts under the control of Waf. This script allows the build system to ensure that the shared library paths are set correctly and that the libraries are available at run time. To run the applications LoRa program, to run the runSimulator shell script by typing the following:
 ```
 $ ./runSimulator.sh gwRing rad gwRad simTime interval pEDs
 ```
 in which the above parameters are defined as:
 ```
+* App      - Applications options 
 * gwRing   - Number of gateway rings to include;
 * rad      - The radius of the area to simulate;
 * gwRad    - The distance between two gateways;
@@ -59,7 +60,17 @@ in which the above parameters are defined as:
 * trial    - The results directory; 
 * pED      - Whether or not to print a file containing the ED's positions;
 ```
+Applications Options:
+```
+* 0      - lorawan Application base 
+* 1      - lorawan Application multiClass
+* 2      - lorawan Application Regular and Alarm 
+* 3      - lorawan Application  dualClass
+
+```
 The results will be placed in TestReult:
 ```
 $ ls TestResult/
-$ test0  test1  test2  test3  test4  test5
+$ test0 test1 test2 testX
+```
+where X is trial's options
