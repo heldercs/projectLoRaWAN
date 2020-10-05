@@ -1,126 +1,65 @@
+# projectLoRaWAN
 
-The Network Simulator, Version 3
-================================
+This project is an ns-3 module that can be used to perform simulations of a LoRaWAN network, and it is based in the initial version of this code was developed as part of a master's thesis at the University of Padova (https://github.com/signetlabdei/lorawan), under the supervision of Prof. Lorenzo Vangelista, Prof. Michele Zorzi and with the help of Marco Centenaro.
 
-## Table of Contents:
+## Getting Started ##
 
-1) [An overview](#an-open-source-project)
-2) [Building ns-3](#building-ns-3)
-3) [Running ns-3](#running-ns3)
-4) [Getting access to the ns-3 documentation](#getting-access-to-the-ns-3-documentation)
-5) [Working with the development version of ns-3](#working-with-the-development-version-of-ns-3)
+This section is aimed at getting a user to a working state starting with a machine that may never have had LoRaWAN-NS3 installed. It covers prerequisites, ways to obtain LoRaWAN-NS3, ways to build LoRaWAN-NS3, and ways to verify your build and run LoRaWAN program.
 
-Note:  Much more substantial information about ns-3 can be found at
-http://www.nsnam.org
-
-## An Open Source project
-
-ns-3 is a free open source project aiming to build a discrete-event
-network simulator targeted for simulation research and education.   
-This is a collaborative project; we hope that
-the missing pieces of the models we have not yet implemented
-will be contributed by the community in an open collaboration
-process.
-
-The process of contributing to the ns-3 project varies with
-the people involved, the amount of time they can invest
-and the type of model they want to work on, but the current
-process that the project tries to follow is described here:
-http://www.nsnam.org/developers/contributing-code/
-
-This README excerpts some details from a more extensive
-tutorial that is maintained at:
-http://www.nsnam.org/documentation/latest/
-
-## Building ns-3
-
-The code for the framework and the default models provided
-by ns-3 is built as a set of libraries. User simulations
-are expected to be written as simple programs that make
-use of these ns-3 libraries.
-
-To build the set of default libraries and the example
-programs included in this package, you need to use the
-tool 'waf'. Detailed information on how to use waf is
-included in the file doc/build.txt
-
-However, the real quick and dirty way to get started is to
-type the command
-```shell
-./waf configure --enable-examples
+### Prerequisites ###
+```
+$ sudo apt-get update
+$ sudo apt-get -y install gcc g++ python gcc g++ python python-dev qt4-dev-tools libqt4-dev mercurial \
+bzr cmake libc6-dev libc6-dev-i386 g++-multilib gdb valgrind gsl-bin libgsl2 libgsl2:i386 flex bison \
+libfl-dev tcpdump sqlite sqlite3 libsqlite3-dev libxml2 libxml2-dev libgtk2.0-0 libgtk2.0-dev \
+vtun lxc git
 ```
 
-followed by
+### Downloading LoRaWAN-NS3 ###
 
-```shell
-./waf
+Let’s assume that you, as a user, wish to build LoRaWAN-NS3 in a local directory called Workspace. If you adopt the Workspace directory approach, you can get a copy of a release by typing the following into your Linux shell:
+```
+$ git clone https://github.com/heldercs/projectLoRaWAN-NS3
 ```
 
-in the directory which contains this README file. The files
-built will be copied in the build/ directory.
+### Building LoRaWAN-NS3 ###
 
-The current codebase is expected to build and run on the
-set of platforms listed in the [release notes](RELEASE_NOTES)
-file.
-
-Other platforms may or may not work: we welcome patches to
-improve the portability of the code to these other platforms.
-
-## Running ns-3
-
-On recent Linux systems, once you have built ns-3 (with examples
-enabled), it should be easy to run the sample programs with the
-following command, such as:
-
-```shell
-./waf --run simple-global-routing
+To configure the LoRaWAN-NS3 you will need to execute the following commands:
+```
+$ ./waf configure --build-profile=debug --enable-examples --enable-tests
+```
+The build system is now configured and you can build the debug versions of the LoRaWAN-NS3 programs by simply typing
+```
+$ ./waf
 ```
 
-That program should generate a `simple-global-routing.tr` text
-trace file and a set of `simple-global-routing-xx-xx.pcap` binary
-pcap trace files, which can be read by `tcpdump -tt -r filename.pcap`
-The program source can be found in the examples/routing directory.
+### Testing LoRaWAN-NS3 ###
 
-## Getting access to the ns-3 documentation
-
-Once you have verified that your build of ns-3 works by running
-the simple-point-to-point example as outlined in 3) above, it is
-quite likely that you will want to get started on reading
-some ns-3 documentation.
-
-All of that documentation should always be available from
-the ns-3 website: http:://www.nsnam.org/documentation/.
-
-This documentation includes:
-
-  - a tutorial
-
-  - a reference manual
-
-  - models in the ns-3 model library
-
-  - a wiki for user-contributed tips: http://www.nsnam.org/wiki/
-
-  - API documentation generated using doxygen: this is
-    a reference manual, most likely not very well suited
-    as introductory text:
-    http://www.nsnam.org/doxygen/index.html
-
-## Working with the development version of ns-3
-
-If you want to download and use the development version of ns-3, you
-need to use the tool `git`. A quick and dirty cheat sheet is included
-in the manual, but reading through the git
-tutorials found in the Internet is usually a good idea if you are not
-familiar with it.
-
-If you have successfully installed git, you can get
-a copy of the development version with the following command:
-```shell
-git clone https://gitlab.com/nsnam/ns-3-dev.git
+You can run the unit tests of the ns-3 distribution by running the ./test.py -c core script:
 ```
+$ ./test.py -c core
+```
+These tests are run in parallel by Waf. You should eventually see a report saying that
+```
+246 of 249 tests passed (246 passed, 3 skipped, 0 failed, 0 crashed, 0 valgrind errors)
+```
+### Running the Script ###
 
-However, we recommend to follow the Gitlab guidelines for starters,
-that includes creating a Gitlab account, forking the ns-3-dev project
-under the new account's name, and then cloning the forked repository.
-You can find more information in the manual [link].
+We typically run scripts under the control of Waf. This allows the build system to ensure that the shared library paths are set correctly and that the libraries are available at run time. To run the LoRa program, simply to run the runSimulator shell script by typing the following:
+```
+$ ./runSimulator.sh gwRing rad gwRad simTime interval pEDs
+```
+in which the above parameters are defined as:
+```
+* gwRing   - Number of gateway rings to include;
+* rad      - The radius of the area to simulate;
+* gwRad    - The distance between two gateways;
+* simTime  - The time for which to simulate;
+* interval - The period in seconds to be used by periodically transmitting applications;
+* trial    - The results directory; 
+* pED      - Whether or not to print a file containing the ED's positions;
+```
+The results will be placed in TestReult:
+```
+$ ls TestResult/
+$ test0  test1  test2  test3  test4  test5
