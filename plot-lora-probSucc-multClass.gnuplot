@@ -35,21 +35,18 @@ set style line 10 lt 2 lc rgb '#000000' lw 3 # black
 #set multiplot
 
 # Filename of the data
-filename='./TestResult/result-math-SF789_PLB.dat'
-filename1='./TestResult/result-math-SF789_EAB.dat'
-filename2='./TestResult/result-math-SF789_NIB.dat'
-filename3='./TestResult/result-math-SF789_FIB.dat'
+filename1='./TestResult/result-math-SF789_PLB.dat'
+filename2='./TestResult/result-math-SF789_EAB.dat'
+filename3='./TestResult/result-math-SF789_ONI.dat'
+filename4='./TestResult/result-math-SF789_OFI.dat'
+filename5='./TestResult/result-sim-SF789_PLB.dat'
+filename6='./TestResult/result-sim-SF789_EAB.dat'
+filename7='./TestResult/result-sim-SF789_ONI.dat'
+filename8='./TestResult/result-sim-SF789_OFI.dat'
 
 
 # Plot the data
-#plot filename using 1:5 w l ls 1 t 'avg SF789', filename5 using 1:5 ls 7 notitle, filename1 using 1:5 w l ls 2 t 'avg SF789-Size', filename6 using 1:5 ls 8 notitle, filename2 using 1:5 w l ls 3 t 'avg SF789-EAB', filename7 using 1:5 ls 9 notitle, filename3 using 1:5 w l ls 4 t 'avg SF789-EAB-Size', filename8 using 1:5 ls 10 notitle, filename4 using 1:2 w l ls 6 t 'only SF = 7', filename9 using 1:2 ls 6 notitle
+plot filename1 using 1:5 w l ls 1 t 'avg PLB', filename5 using 1:5 ls 7 notitle, filename2 using 1:5 w l ls 2 t 'avg EAB', filename6 using 1:5 ls 8 notitle, filename3 using 1:5 w l ls 3 t 'avg ONI', filename7 using 1:5 ls 9 notitle, filename4 using 1:5 w l ls 4 t 'avg OFI', filename8 using 1:5 ls 10 notitle
 
-plot filename using 1:5 w l ls 1 t 'avg PLB', filename1 using 1:5 w l ls 2 t 'svg EAB', filename2 using 1:5 w l ls 3 t 'avg NIB', filename3 using 1:5 w l ls 4 t 'avg FIB'
-
-
-
-#, filename2 using 1:5 w l ls 3 t 'avg SF789-080', filename3 using 1:5 w l ls 5 t 'avg SF789-MIX'
-
-
-
+#plot filename using 1:5 w l ls 1 t 'avg PLB', filename4 using 1:5 w l ls 1 t 'avg PLB', filename1 using 1:5 w l ls 2 t 'svg EAB', filename2 using 1:5 w l ls 3 t 'avg NIB', filename3 using 1:5 w l ls 4 t 'avg FIB'
 

@@ -3,7 +3,7 @@ reset
 
 # Set terminal up
 #set term pngcairo font "FreeSans, 10" size 1024, 768
-set term postscript eps color blacktext "Times-Roman-Bold" 16
+set term postscript eps enhanced color blacktext "Times-Roman-Bold" 16
 set grid
 #set key box lt -1 lw 2
 set xrange [0:1]

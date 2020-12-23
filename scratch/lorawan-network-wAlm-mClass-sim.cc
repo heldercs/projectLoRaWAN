@@ -218,13 +218,8 @@ int main (int argc, char *argv[]){
   	cmd.Parse (argc, argv);
 
 	
- 	if(nDevices < 1000){
-		nAlarms = 10;
-		nRegulars = nDevices - nAlarms;
-	}else{
-		nRegulars = nDevices/(1.01); 
-		nAlarms = nDevices - nRegulars;
-	}
+	nRegulars = 0.95*nDevices; 
+	nAlarms = nDevices - nRegulars;
 
 	NS_LOG_DEBUG("number regular event: " << nRegulars << "number alarm event: " << nAlarms );
 

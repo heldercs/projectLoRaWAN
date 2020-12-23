@@ -329,7 +329,7 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
   //////////////
 
   LogicalLoraChannelHelper channelHelper;
-  channelHelper.AddSubBand (867, 868.6, 0.1, 14);
+  channelHelper.AddSubBand (867, 868.6, 1, 14);
   channelHelper.AddSubBand (868.7, 869.2, 0.001, 14);
   channelHelper.AddSubBand (869.4, 869.65, 0.1, 27);
 
@@ -516,7 +516,7 @@ LorawanMacHelper::SetSpreadingFactorsEIB (NodeContainer endDevices, double rad)
   NS_LOG_FUNCTION_NOARGS ();
 
   std::vector<int> sfQuantity (7, 0);
-  double pos=0, threshold=rad/6;
+  double pos=0, threshold=rad/3;
   for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
     {
       Ptr<Node> object = *j;
@@ -696,8 +696,11 @@ LorawanMacHelper::SetSpreadingFactorsStrategies (NodeContainer endDevices, std::
       						NS_ASSERT (loraNetDevice != 0);
       						Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
       						NS_ASSERT (mac != 0);
-							sfQuantity[0]++;
-							mac->SetDataRate(5);
+							//std::cout << " sf: " << (unsigned)mac->GetDataRate() << std::endl; 
+							if (mac->GetDataRate() == 0 ){
+								sfQuantity[1]++;
+								mac->SetDataRate(4);
+							}
 						}
 	
 						for (uint32_t  j = edge; j < nDev; ++j){
@@ -707,8 +710,17 @@ LorawanMacHelper::SetSpreadingFactorsStrategies (NodeContainer endDevices, std::
       						NS_ASSERT (loraNetDevice != 0);
       						Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
       						NS_ASSERT (mac != 0);
-							sfQuantity[1]++;
-							mac->SetDataRate(4);
+							//std::cout << " sf: " << (unsigned)mac->GetDataRate() << std::endl; 
+							if (mac->GetDataRate() == 0 ){
+								/*  if (edge){
+									sfQuantity[1]++;
+									mac->SetDataRate(4);
+									edge--;
+								}else{*/
+									sfQuantity[0]++;
+									mac->SetDataRate(5);
+								//}
+							}
 						}
 					}			
 					break;
@@ -747,7 +759,70 @@ LorawanMacHelper::SetSpreadingFactorsStrategies (NodeContainer endDevices, std::
 							sfQuantity[2]++;
 							mac->SetDataRate(3);
 						}
+					}
+					break;
+				case ALM_FI:
+					{
+						//std::cout << "edge: " << (unsigned)edge << std::endl;	
+						for (uint32_t  j = 0; j < edge; ++j){
+							Ptr<Node> object = endDevices.Get(j);
+    						Ptr<NetDevice> netDevice = object->GetDevice (0);
+      						Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      						NS_ASSERT (loraNetDevice != 0);
+      						Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      						NS_ASSERT (mac != 0);
+							//std::cout << " sf: " << (unsigned)mac->GetDataRate() << std::endl; 
+							if (mac->GetDataRate() == 0 ){
+								sfQuantity[1]++;
+								mac->SetDataRate(4);
+							}
+						}
+	
+						for (uint32_t  j = edge; j < nDev; ++j){
+							Ptr<Node> object = endDevices.Get(j);
+    						Ptr<NetDevice> netDevice = object->GetDevice (0);
+      						Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      						NS_ASSERT (loraNetDevice != 0);
+      						Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      						NS_ASSERT (mac != 0);
+							//std::cout << " sf: " << (unsigned)mac->GetDataRate() << std::endl; 
+							if (mac->GetDataRate() == 0 ){
+								/*  if (edge){
+									sfQuantity[1]++;
+									mac->SetDataRate(4);
+									edge--;
+								}else{*/
+									sfQuantity[0]++;
+									mac->SetDataRate(5);
+								//}
+							}
+						}
 					}			
+					break;
+				case ALM_PI:
+					{
+						for (uint32_t  j = 0; j < nDev; ++j){
+							Ptr<Node> object = endDevices.Get(j);
+    						Ptr<NetDevice> netDevice = object->GetDevice (0);
+      						Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      						NS_ASSERT (loraNetDevice != 0);
+      						Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+      						NS_ASSERT (mac != 0);
+							//std::cout << " sf: " << (unsigned)mac->GetDataRate() << std::endl; 
+							if (mac->GetDataRate() == 0 ){
+								if (edge){
+									sfQuantity[1]++;
+									mac->SetDataRate(4);
+									edge--;
+								}else{
+									sfQuantity[0]++;
+									mac->SetDataRate(5);
+								}
+							}
+						}
+					}
+					break;
+	
 				default:
 					break;
 		}				/* -----  end switch  ----- */
@@ -801,24 +876,24 @@ LorawanMacHelper::SetSpreadingFactorsProp (NodeContainer endDevices, double prop
         }
 
 	}else{
-		if (pos <= sqrt(prop1)*rad)
+		if (pos > sqrt(prop1)*rad)
         {
-        	  mac->SetDataRate (5);
+        	 mac->SetDataRate (5);
          	 sfQuantity[0] = sfQuantity[0] + 1;
         }
-     	else if (pos <= rad)
+       	/*  else if (pos <= rad)
         {
       	  mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
-        }
-    	 else // Device is out of range. Assign SF12.
+        }*/
+/*      	 else // Device is out of range. Assign SF12.
         {
           // NS_LOG_DEBUG ("Device out of range");
           mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
           // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
         }
-
+*/
 	}
  
   } // end loop on nodes

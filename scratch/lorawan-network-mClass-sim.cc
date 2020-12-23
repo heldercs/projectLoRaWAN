@@ -52,6 +52,7 @@ NS_LOG_COMPONENT_DEFINE ("LorawanNetworkSimulator");
 
 // Network settings
 int nDevices = 200;
+int nAlarms = 20;
 int nGateways = 1;
 double radius = 5600;
 double gatewayRadius = 0;
@@ -271,6 +272,7 @@ int main (int argc, char *argv[]){
 	endDevFile += to_string(trial) + "/endDevices" + to_string(nDevices) + ".dat";
 	gwFile += to_string(trial) + "/GWs" + to_string(nGateways) + ".dat";
 
+	nAlarms = 0.5*nDevices;
 	
   	// Set up logging
   	// LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
@@ -407,11 +409,11 @@ int main (int argc, char *argv[]){
       	Ptr<LoraNetDevice> loraNetDevice = node->GetDevice (0)->GetObject<LoraNetDevice> ();
       	Ptr<LoraPhy> phy = loraNetDevice->GetPhy ();
 	 
-      	if (flagRtx){
+/*        	if (flagRtx){
       		Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac>();
 	  		mac->SetMaxNumberOfTransmissions (MAXRTX);
 	  		mac->SetMType (LorawanMacHeader::CONFIRMED_DATA_UP);
-	  	}
+	  	}*/
     }
 
   	/*********************
@@ -456,17 +458,33 @@ int main (int argc, char *argv[]){
    	*  Set up the end device's spreading factor  *
    	**********************************************/
 
-  	sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
+  	//sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
 	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
 	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
-	//sfQuant = macHelper.SetSpreadingFactorsProp (endDevices, 0.80, 0.18, radius);
-	//sfQuant = macHelper.SetSpreadingFactorsStrategies (endDevices, sfQuant, 0.80*nDevices, 0.18*nDevices, nDevices, LorawanMacHelper::CLASS_THREE);
+	//sfQuant = macHelper.SetSpreadingFactorsProp (endDevices, 0.5, 0, radius);
+	sfQuant = macHelper.SetSpreadingFactorsStrategies (endDevices, sfQuant, nAlarms, 0*nDevices, nDevices, LorawanMacHelper::ALM_PI);
 
-/*    	cout << "SFs: ";
+/*      cout << "SFs: ";
 	for (int i=0; i< 6;i++)	
 		cout << "  " << sfQuant.at(i);
 	cout << endl;
 */
+	if (flagRtx){
+		for (uint32_t  j = 0; j < (unsigned)nDevices; ++j){
+			Ptr<Node> object = endDevices.Get(j);
+			Ptr<NetDevice> netDevice = object->GetDevice (0);
+			Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+			NS_ASSERT (loraNetDevice != 0);
+			Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+			NS_ASSERT (mac != 0);
+			if (mac->GetSfFromDataRate(mac->GetDataRate ()) == 8){
+				//cout <<"j: " << j << " sf: " << (unsigned)mac->GetSfFromDataRate(mac->GetDataRate ()) << endl; 
+	  			mac->SetMaxNumberOfTransmissions (MAXRTX);
+	  			mac->SetMType (LorawanMacHeader::CONFIRMED_DATA_UP);
+	  		}
+		}
+	}
+	
 
   	NS_LOG_DEBUG ("Completed configuration");
 
@@ -476,12 +494,11 @@ int main (int argc, char *argv[]){
 
   	Time appStopTime = Seconds (simulationTime);
  
- 	/*  PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
+/*  PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
   	appHelper.SetPeriod (Seconds (appPeriodSeconds));	
 	appHelper.SetPacketSize (19);
   	ApplicationContainer appContainer = appHelper.Install (endDevices);
-	*/
-
+	
  
 	RandomSenderHelper appHelper = RandomSenderHelper ();
   	appHelper.SetMean (appPeriodSeconds);
@@ -491,6 +508,45 @@ int main (int argc, char *argv[]){
 
   	appContainer.Start (Seconds (0));
   	appContainer.Stop (appStopTime);
+*/
+
+    PeriodicSenderHelper appRegularHelper = PeriodicSenderHelper ();
+    appRegularHelper.SetPeriod (Seconds (appPeriodSeconds));
+    appRegularHelper.SetPacketSize (19);
+	ApplicationContainer appRegContainer;
+	for (uint32_t  j = 0; j < (unsigned)nDevices; ++j){
+		//bool first=0;
+		Ptr<Node> object = endDevices.Get(j);
+		Ptr<NetDevice> netDevice = object->GetDevice (0);
+		Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+		NS_ASSERT (loraNetDevice != 0);
+		Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+		NS_ASSERT (mac != 0);
+		if (mac->GetSfFromDataRate(mac->GetDataRate ()) == 7)
+   			appRegContainer.Add(appRegularHelper.Install(endDevices.Get(j)));
+	}
+    NS_LOG_DEBUG("appRegulars -> startTime:" << 0 << "  stopTime:" << appStopTime.GetSeconds());
+    appRegContainer.Start (Seconds(0));
+    appRegContainer.Stop (appStopTime);
+
+    RandomSenderHelper appAlarmHelper = RandomSenderHelper ();
+    appAlarmHelper.SetMean (appPeriodSeconds);
+    appAlarmHelper.SetPacketSize (5);
+	ApplicationContainer appAlmContainer;
+	for (uint32_t  j = 0; j < (unsigned)nDevices; ++j){
+		//bool first=0;
+		Ptr<Node> object = endDevices.Get(j);
+		Ptr<NetDevice> netDevice = object->GetDevice (0);
+		Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+		NS_ASSERT (loraNetDevice != 0);
+		Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac> ();
+		NS_ASSERT (mac != 0);
+		if (mac->GetSfFromDataRate(mac->GetDataRate ()) == 8)
+    		appAlmContainer.Add(appAlarmHelper.Install(endDevices.Get(j)));
+	}
+    NS_LOG_DEBUG("appAlarms -> startTime:" << 0 << "  stopTime:" << appStopTime.GetSeconds());
+    appAlmContainer.Start (Seconds(0));
+    appAlmContainer.Stop (appStopTime);
 
   	/**************************
    	*  Create Network Server  *
@@ -539,7 +595,7 @@ int main (int argc, char *argv[]){
 
 		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), SF7)) >> sent >> received;
 	
-		if(flagRtx)
+  		if(flagRtx)
     		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
 		else
 			stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF7)) >> avgDelay;
@@ -561,7 +617,7 @@ int main (int argc, char *argv[]){
 	  	myfile.close();  
   
 
-	   	NS_LOG_INFO("numDev:" << nDevices << " numGW:" << nGateways << " simTime:" << simulationTime << " throughput:" << throughput);
+	   	NS_LOG_INFO("numDev:" << nAlarms << " numGW:" << nGateways << " simTime:" << simulationTime << " throughput:" << throughput);
   		NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
   		NS_LOG_INFO("sent:" << sent << "    succ:" << received << "     drop:"<< packLoss  << "   delay:" << avgDelay);
  	 	NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl);
@@ -598,11 +654,10 @@ int main (int argc, char *argv[]){
 
 		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), SF8)) >> sent >> received;
 	
-		if(flagRtx)
+ 		if(flagRtx)
     		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
 		else
 			stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF8)) >> avgDelay;
-
 	
 		packLoss = sent - received;
   		throughput = received/simulationTime;
@@ -620,7 +675,7 @@ int main (int argc, char *argv[]){
 	  	myfile.close();  
   
 
-	   	NS_LOG_INFO("numDev:" << nDevices << " numGW:" << nGateways << " simTime:" << simulationTime << " throughput:" << throughput);
+	   	NS_LOG_INFO("numDev:" << nDevices-nAlarms << " numGW:" << nGateways << " simTime:" << simulationTime << " throughput:" << throughput);
   		NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
   		NS_LOG_INFO("sent:" << sent << "    succ:" << received << "     drop:"<< packLoss  << "   delay:" << avgDelay);
  	 	NS_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl);

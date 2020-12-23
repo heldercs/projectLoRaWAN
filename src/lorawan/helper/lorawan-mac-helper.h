@@ -50,7 +50,7 @@ public:
   /**
    * Define the operational region.
    */
-  enum StrategieSF { SHIFT_ONE, SHIFT_TWO, CLASS_TWO, CLASS_THREE, SERVE };
+  enum StrategieSF { SHIFT_ONE, SHIFT_TWO, CLASS_TWO, CLASS_THREE, ALM_FI, ALM_PI, SERVE };
 
   /**
    * Create a mac helper without any parameter set. The user must set
