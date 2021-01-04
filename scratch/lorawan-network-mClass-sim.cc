@@ -272,7 +272,7 @@ int main (int argc, char *argv[]){
 	endDevFile += to_string(trial) + "/endDevices" + to_string(nDevices) + ".dat";
 	gwFile += to_string(trial) + "/GWs" + to_string(nGateways) + ".dat";
 
-	nAlarms = 0.5*nDevices;
+	nAlarms = 0.33*nDevices;
 	
   	// Set up logging
   	// LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
@@ -595,9 +595,9 @@ int main (int argc, char *argv[]){
 
 		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), SF7)) >> sent >> received;
 	
-  		if(flagRtx)
-    		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
-		else
+//  		if(flagRtx)
+//    		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
+//		else
 			stringstream(tracker.CountMacPacketsGloballyDelay (Seconds (0), appStopTime + Hours (1), (unsigned)nDevices, (unsigned)nGateways, SF7)) >> avgDelay;
 
 	

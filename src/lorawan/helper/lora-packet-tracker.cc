@@ -706,45 +706,47 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
   	for (auto itMac = m_macPacketTracker.begin (); itMac != m_macPacketTracker.end (); ++itMac)
     {
       // NS_LOG_DEBUG ("Dealing with packet " << (*itMac).first);
+	  if ((*itMac).second.sf == 8)
+	  {	
+      	if ((*itMac).second.sendTime > startTime && (*itMac).second.sendTime < stopTime)
+       	 {
+        	  // Count retransmissions
+         	 ////////////////////////
+         	 auto itRetx = m_reTransmissionTracker.find ((*itMac).first);
 
-      if ((*itMac).second.sendTime > startTime && (*itMac).second.sendTime < stopTime)
-        {
-          // Count retransmissions
-          ////////////////////////
-          auto itRetx = m_reTransmissionTracker.find ((*itMac).first);
+          	if (itRetx == m_reTransmissionTracker.end ())
+           	 {
+            	  // This means that the device did not finish retransmitting
+             	 NS_ABORT_MSG ("Searched packet was not found" << "Packet " <<
+               	             (*itMac).first << " not found. Sent at " <<
+               	             (*itMac).second.sendTime.GetSeconds ());
+           	 }
 
-          if (itRetx == m_reTransmissionTracker.end ())
-            {
-              // This means that the device did not finish retransmitting
-              NS_ABORT_MSG ("Searched packet was not found" << "Packet " <<
-                            (*itMac).first << " not found. Sent at " <<
-                            (*itMac).second.sendTime.GetSeconds ());
-            }
+          	packetsOutsideTransient++;
+          	totalReTxAmounts += (*itRetx).second.reTxAttempts;
 
-          packetsOutsideTransient++;
-          totalReTxAmounts += (*itRetx).second.reTxAttempts;
-
-          if ((*itRetx).second.successful)
-            {
-              successfulReTxAmounts++;
-            }
+          	if ((*itRetx).second.successful)
+           	 {
+           	   successfulReTxAmounts++;
+           	 }
 		  
-          // Compute delays
-          /////////////////
-          if ((*itMac).second.receptionTimes.find(Simulator::GetContext ())->second == Time::Max ())
-            {
-              // NS_LOG_DEBUG ("Packet never received, ignoring it");
-              //cout << "Packet never received, ignoring it" << endl;;
-              packetsOutsideTransient--;
-            }
-          else
-            {
-			  //cout << "rcpT: " << (*itMac).second.receptionTimes.find(Simulator::GetContext ())->second << endl;
-              sumDelay += (*itRetx).second.finishTime - (*itRetx).second.firstAttempt;
-            }
+          	// Compute delays
+          	/////////////////
+          	if ((*itMac).second.receptionTimes.find(Simulator::GetContext ())->second == Time::Max ())
+           	 {
+            	// NS_LOG_DEBUG ("Packet never received, ignoring it");
+             	//cout << "Packet never received, ignoring it" << endl;;
+             	 packetsOutsideTransient--;
+             }
+          	else
+           	 {
+				  //cout << "rcpT: " << (*itMac).second.receptionTimes.find(Simulator::GetContext ())->second << endl;
+             	 sumDelay += (*itRetx).second.finishTime - (*itRetx).second.firstAttempt;
+             }
 
-        }
-    }
+         }
+	  } 
+	}
 
 	//cout << "numRTX: " <<  (unsigned)totalReTxAmounts << endl;
 	
