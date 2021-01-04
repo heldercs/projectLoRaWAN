@@ -93,7 +93,7 @@ then
 	file4="./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt"
 
 
-	for numSta in {100..100..4000}
+	for numSta in {100..4000..100}
 	do
 			echo "trial:$trial-numSTA:$numSta #"
 
@@ -129,7 +129,7 @@ then
 	touch ./TestResult/test$trial/traffic-$interval/mac-almSTAs-GW-$gwRing.txt
 	file4="./TestResult/test$trial/traffic-$interval/mac-almSTAs-GW-$gwRing.txt"
 
-	for numSta in {100..100..4000}
+	for numSta in {100..4000..100}
 	do
 			echo "trial:$trial-numSTA:$numSta"
 
@@ -166,7 +166,7 @@ else
 	file4="./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt"
 
 
-	for numSta in {100..100..4000}
+	for numSta in {100..4000..100}
 	do
 			echo "trial:$trial-numSTA:$numSta #"
 
