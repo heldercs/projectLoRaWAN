@@ -329,7 +329,7 @@ LorawanMacHelper::ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const
   //////////////
 
   LogicalLoraChannelHelper channelHelper;
-  channelHelper.AddSubBand (867, 868.6, 0.1, 14);
+  channelHelper.AddSubBand (867, 868.6, 1, 14);
   channelHelper.AddSubBand (868.7, 869.2, 0.001, 14);
   channelHelper.AddSubBand (869.4, 869.65, 0.1, 27);
 
@@ -698,8 +698,8 @@ LorawanMacHelper::SetSpreadingFactorsStrategies (NodeContainer endDevices, std::
       						NS_ASSERT (mac != 0);
 							//std::cout << " sf: " << (unsigned)mac->GetDataRate() << std::endl; 
 							if (mac->GetDataRate() == 0 ){
-								sfQuantity[1]++;
-								mac->SetDataRate(4);
+								sfQuantity[0]++;
+								mac->SetDataRate(5);
 							}
 						}
 	
@@ -717,8 +717,8 @@ LorawanMacHelper::SetSpreadingFactorsStrategies (NodeContainer endDevices, std::
 									mac->SetDataRate(4);
 									edge--;
 								}else{*/
-									sfQuantity[0]++;
-									mac->SetDataRate(5);
+									sfQuantity[1]++;
+									mac->SetDataRate(4);
 								//}
 							}
 						}
@@ -876,24 +876,24 @@ LorawanMacHelper::SetSpreadingFactorsProp (NodeContainer endDevices, double prop
         }
 
 	}else{
-		if (pos > sqrt(prop1)*rad)
+		if (pos <= sqrt(prop1)*rad)
         {
         	 mac->SetDataRate (5);
          	 sfQuantity[0] = sfQuantity[0] + 1;
         }
-       	/*  else if (pos <= rad)
+        else if (pos <= rad)
         {
       	  mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
-        }*/
-/*      	 else // Device is out of range. Assign SF12.
+        }
+   	 	else // Device is out of range. Assign SF12.
         {
           // NS_LOG_DEBUG ("Device out of range");
           mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
           // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
         }
-*/
+
 	}
  
   } // end loop on nodes
