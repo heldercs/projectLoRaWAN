@@ -594,22 +594,22 @@ LorawanMacHelper::SetSpreadingFactorsEAB (NodeContainer endDevices, double rad)
 	   
 	  pos = sqrt(pow(position->GetPosition().x, 2) + pow(position->GetPosition().y, 2));
 
-      if (pos <= rad/sqrt(3))
+      if (pos <= rad/sqrt(6))
         {
           mac->SetDataRate (5);
           sfQuantity[0] = sfQuantity[0] + 1;
         }
-      else if (pos <= sqrt(2)*rad/sqrt(3))
+      else if (pos <= sqrt(2)*rad/sqrt(6))
         {
           mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
         }
-      else if (pos <= sqrt(3)*rad/sqrt(3))
+      else if (pos <= sqrt(3)*rad/sqrt(6))
         {
           mac->SetDataRate (3);
           sfQuantity[2] = sfQuantity[2] + 1;
         }
-/*      else if (pos < (sqrt(4)*rad/sqrt(6)))
+      else if (pos < (sqrt(4)*rad/sqrt(6)))
         {
           mac->SetDataRate (2);
           sfQuantity[3] = sfQuantity[3] + 1;
@@ -623,7 +623,7 @@ LorawanMacHelper::SetSpreadingFactorsEAB (NodeContainer endDevices, double rad)
         {
           mac->SetDataRate (0);
           sfQuantity[5] = sfQuantity[5] + 1;
-        }*/
+        }
       else // Device is out of range. Assign SF12.
         {
           // NS_LOG_DEBUG ("Device out of range");
@@ -858,11 +858,12 @@ LorawanMacHelper::SetSpreadingFactorsProp (NodeContainer endDevices, double prop
          	 sfQuantity[0] = sfQuantity[0] + 1;
         }
       	else if (pos <= sqrt(prop1+prop2)*rad)
+       	//else if (pos > sqrt(prop2)*rad)
         {
           mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
         }
-     	else if (pos <= rad)
+       	else if (pos <= rad)
         {
       	  mac->SetDataRate (3);
           sfQuantity[2] = sfQuantity[2] + 1;
@@ -874,26 +875,26 @@ LorawanMacHelper::SetSpreadingFactorsProp (NodeContainer endDevices, double prop
           sfQuantity[2] = sfQuantity[2] + 1;
           // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
         }
-
 	}else{
-		if (pos <= sqrt(prop1)*rad)
+		if (pos < sqrt(prop1)*rad)
         {
         	 mac->SetDataRate (5);
          	 sfQuantity[0] = sfQuantity[0] + 1;
         }
-        else if (pos <= rad)
+
+/*         else if (pos <= rad)
         {
       	  mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
         }
-   	 	else // Device is out of range. Assign SF12.
+	 	else // Device is out of range. Assign SF12.
         {
           // NS_LOG_DEBUG ("Device out of range");
           mac->SetDataRate (4);
           sfQuantity[1] = sfQuantity[1] + 1;
           // NS_LOG_DEBUG ("sfQuantity[6] = " << sfQuantity[6]);
         }
-
+*/
 	}
  
   } // end loop on nodes

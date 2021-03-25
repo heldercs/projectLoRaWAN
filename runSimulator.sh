@@ -77,23 +77,14 @@ then
 elif [ $1 -eq 1 ]
 then
 
-	touch ./TestResult/test$trial/traffic-$interval/result-STAs-SF7.dat
-	file1="./TestResult/test$trial/traffic-$interval/result-STAs-SF7.dat"
-	echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-STAs-SF7.dat 
+	file1="./TestResult/test$trial/traffic-$interval/result-STAs"
+#	echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-STAs-SF7.dat 
 		
-	touch ./TestResult/test$trial/traffic-$interval/result-STAs-SF8.dat
-	file2="./TestResult/test$trial/traffic-$interval/result-STAs-SF8.dat"
-	echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-STAs-SF8.dat 
-	
-	touch ./TestResult/test$trial/traffic-$interval/result-STAs-SF9.dat
-	file3="./TestResult/test$trial/traffic-$interval/result-STAs-SF9.dat"
-	echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-STAs-SF9.dat 	
-
 	touch ./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt
-	file4="./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt"
+	file2="./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt"
 
 
-	for numSta in {100..4000..100}
+	for numSta in {100..2000..100}
 	do
 			echo "trial:$trial-numSTA:$numSta #"
 
@@ -109,22 +100,14 @@ then
 		for numSeed in {1..5}
 		do
 			echo -ne "$numSeed \r"
-  			./waf --run "lorawan-network-mClass-sim --nSeed=$numSeed --nDevices=$numSta --nGateways=$gwRing --radius=$rad --gatewayRadius=$gwRad --simulationTime=$simTime --appPeriod=$interval --file1=$file1 --file2=$file2 --file3=$file3 --file4=$file4 --printEDs=$pEDs --trial=$trial" > ./TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/record-$numSta.txt 2>&1
+  			./waf --run "lorawan-network-mClass-sim --nSeed=$numSeed --nDevices=$numSta --nGateways=$gwRing --radius=$rad --gatewayRadius=$gwRad --simulationTime=$simTime --appPeriod=$interval --file1=$file1 --file2=$file2 --printEDs=$pEDs --trial=$trial" > ./TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/record-$numSta.txt 2>&1
 		done
 	done
 elif [ $1 -eq 2 ]
 then
 
-	touch ./TestResult/test$trial/traffic-$interval/result-regSTAs.dat
-	file1="./TestResult/test$trial/traffic-$interval/result-regSTAs.dat"
-	echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-regSTAs.dat 
-	
-	touch ./TestResult/test$trial/traffic-$interval/mac-regSTAs-GW-$gwRing.txt
-	file2="./TestResult/test$trial/traffic-$interval/mac-regSTAs-GW-$gwRing.txt"
-
-	touch ./TestResult/test$trial/traffic-$interval/result-almSTAs.dat
-	file3="./TestResult/test$trial/traffic-$interval/result-almSTAs.dat"
-	echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-almSTAs.dat 
+	file1="./TestResult/test$trial/traffic-$interval/result-regSTAs"
+	#echo "#numSta, Throughput(Kbps), ProbSucc(%), ProbLoss(%), avgDelay(Seconds)" > ./TestResult/test$trial/traffic-$interval/result-regSTAs.dat 
 	
 	touch ./TestResult/test$trial/traffic-$interval/mac-almSTAs-GW-$gwRing.txt
 	file4="./TestResult/test$trial/traffic-$interval/mac-almSTAs-GW-$gwRing.txt"
@@ -145,7 +128,7 @@ then
 		for numSeed in {1..5}
 		do
 			echo -ne "$numSeed \r"
-  			./waf --run "lorawan-network-wAlm-sim --nSeed=$numSeed --nDevices=$numSta --nGateways=$gwRing --radius=$rad --gatewayRadius=$gwRad --simulationTime=$simTime --appPeriod=$interval --file1=$file1 --file2=$file2 --file3=$file3 --file4=$file4 --printEDs=$pEDs --trial=$trial"  > ./TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/record-$numSta.txt 2>&1
+  			./waf --run "lorawan-network-wAlm-sim --nSeed=$numSeed --nDevices=$numSta --nGateways=$gwRing --radius=$rad --gatewayRadius=$gwRad --simulationTime=$simTime --appPeriod=$interval --file1=$file1 --file2=$file2 --printEDs=$pEDs --trial=$trial"  > ./TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/record-$numSta.txt 2>&1
 		done
 	done
 else
@@ -190,6 +173,6 @@ else
 fi
 echo "##### Simulation finish #####"
 echo "seinding email..."
-'echo simulation finish | mail -s Simulator helderhdw@gmail.com
+#'echo simulation finish | mail -s Simulator helderhdw@gmail.com
 
 

@@ -319,7 +319,7 @@ int main (int argc, char *argv[]){
 	}
 */
 
-	nRegulars = 100;
+	nRegulars = 470;
 	nAlarms = nDevices - nRegulars;
 
 	NS_LOG_DEBUG("number regular event: " << nRegulars << "number alarm event: " << nAlarms );
@@ -530,7 +530,7 @@ int main (int argc, char *argv[]){
    	**********************************************/
 
   	sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
-	//sfQuant = macHelper.SetSpreadingFactorsStrategies (endDevices, sfQuant, nRegulars, nDevices, LorawanMacHelper::SHIFT_ONE);
+	sfQuant = macHelper.SetSpreadingFactorsStrategies (endDevices, sfQuant, nRegulars, 0, nDevices, LorawanMacHelper::SHIFT_TWO);
     //sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
     //sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
     //sfQuant = macHelper.SetSpreadingFactorsProp (endDevices, radius);
