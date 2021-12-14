@@ -19,7 +19,7 @@ vtun lxc git
 
 Let’s assume that you, as a user, wish to build LoRaWAN-NS3 in a local directory called Workspace. If you adopt the Workspace directory approach, you can get a copy of a release by typing the following into your Linux shell:
 ```
-$ git clone https://github.com/heldercs/projectLoRaWANNS3
+$ git clone https://github.com/heldercs/projectLoRaWAN
 ```
 
 ### Building LoRaWAN-NS3 ###
