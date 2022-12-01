@@ -44,6 +44,12 @@ public:
    	*/
   	void SetMean (double);
 
+   	/**
+   	* Set the initial delay of this application
+   	*/
+  	void SetBound (double);
+
+
   	/**
    	* Set packet size
    	*/

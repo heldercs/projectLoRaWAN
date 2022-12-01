@@ -39,6 +39,7 @@ RandomSenderHelper::RandomSenderHelper (){
 
 	m_initialDelay = CreateObject<ExponentialRandomVariable> ();
 	m_initialDelay->SetAttribute ("Mean", DoubleValue (10));
+	//m_initialDelay->SetAttribute ("Bound", DoubleValue (10));
 
   	m_pktSize = 5;
 }
@@ -72,12 +73,13 @@ Ptr<Application> RandomSenderHelper::InstallPriv (Ptr<Node> node) const{
 
 	initTime = Seconds (m_initialDelay->GetValue ());	
  
-  	NS_LOG_DEBUG ("Created an alarm on timer = " <<
+  	NS_LOG_DEBUG ("Created an event on timer = " <<
                 initTime.GetSeconds() << " Seconds");
 
  	app->SetInitialDelay (initTime);
   	app->SetPacketSize (m_pktSize);
 	app->SetMean (m_initialDelay->GetMean());
+  	//app->SetBound (m_initialDelay->GetBound());
   	app->SetNode (node);
   	node->AddApplication (app);
 
@@ -88,6 +90,9 @@ void RandomSenderHelper::SetMean (int mean) {
 	m_initialDelay->SetAttribute ("Mean", DoubleValue (mean));
 }
 
+void RandomSenderHelper::SetBound (int bound) {
+	m_initialDelay->SetAttribute ("Bound", DoubleValue (bound));
+}
 
 void RandomSenderHelper::SetPacketSize (uint8_t size){
   	m_pktSize = size;

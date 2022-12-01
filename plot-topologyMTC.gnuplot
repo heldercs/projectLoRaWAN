@@ -40,12 +40,12 @@ set key horizontal Right
 
 # Use a good looking palette
 set palette maxcolors 6
-set palette defined (1 "#fee5d9",\
-2 "#fcbba1",\
-3 "#fc9272",\
-4 "#fb6a4a",\
-5 "#de2d26",\
-6 "#a50f15")
+set palette defined (1 "#e40303",\
+2 "#ff8c00",\
+3 "#ffed00",\
+4 "#008026",\
+5 "#004dff",\
+6 "#750787")
 
 
 #set cblab 'Spreading Factor' 
@@ -67,5 +67,5 @@ set style rect fc lt -1 fs solid 0.15 noborder
 # Plot the data
 #plot filename_edR using 1:2:3 with points ps 2 pt 7 lc 'black' t 'ED Regular', filename_edR using 1:2:3 with points ps 2 pt 7 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 11 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 10 lw 5 lc 'black' t 'ED Alarm', filename_gw using 1:2 with points ls 3 t 'Gateway'
 #plot filename_edR using 1:2:3 with points ps 2 pt 7 lc 'black' t 'ED Regular', filename_edR using 1:2:3 with points ps 2 pt 7 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 11 palette notitle, filename_edA using 1:2:3 with points ps 4 pt 10 lw 5 lc 'black' t 'ED Alarm', filename_gw using 1:2 with points ls 3 t 'Gateway', filename_gw with boxes fs solid 1 lc rgb 'grey90' lw 16 t 'Obstacles'
-plot filename_edR using ($1/1000):($2/1000):3 with points lw 2 ps 2 pt 6 lc 'black' t 'Dispositivo final', filename_edR using ($1/1000):($2/1000):3 with points ps 1.2 pt 7 palette notitle, filename_gw using 1:2 with points ls 3 t 'Gateway'
+plot filename_ed using ($1/1000):($2/1000):3 with points lw 2 ps 2 pt 6 lc 'black' t 'Nodes', filename_ed using ($1/1000):($2/1000):3 with points ps 1.2 pt 7 palette notitle, filename_gw using 1:2 with points ls 3 t 'Gateway'
 #plot filename_edR using ($1/1000):($2/1000):3 with points ps 2 pt 6 lc 'black' t 'Regular', filename_edR using ($1/1000):($2/1000):3 with points pt 7 palette notitle, filename_edA using ($1/1000):($2/1000):3 with points ps 4 pt 11 palette notitle, filename_edA using ($1/1000):($2/1000):3 with points ps 4 pt 10 lw 5 lc 'black' t 'Alarme', filename_gw using ($1/1000):($2/1000) with points ls 3 t 'Gateway'

@@ -31,8 +31,7 @@ namespace lorawan {
 /**
  * Enum for every possible command type
  */
-enum MacCommandType
-{
+enum MacCommandType{
   INVALID,
   LINK_CHECK_REQ,
   LINK_CHECK_ANS,

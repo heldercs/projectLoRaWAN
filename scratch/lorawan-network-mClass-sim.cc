@@ -268,16 +268,16 @@ int main (int argc, char *argv[]){
 	gwFile += to_string(trial) + "/GWs" + to_string(nGateways) + ".dat";
 	
   	// Set up logging
-  	// LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
+  	 LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraPacketTracker", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LoraChannel", LOG_LEVEL_INFO);
+  	 LogComponentEnable("LoraChannel", LOG_LEVEL_INFO);
   	// LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
   	// LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
   	// LogComponentEnable("GatewayLoraPhy", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraInterferenceHelper", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LorawanMac", LOG_LEVEL_ALL);
-  	// LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
-  	// LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
+  	 LogComponentEnable("LorawanMac", LOG_LEVEL_ALL);
+  	 LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+  	 LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
   	// LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
   	// LogComponentEnable("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
   	// LogComponentEnable("LogicalLoraChannel", LOG_LEVEL_ALL);
@@ -286,8 +286,8 @@ int main (int argc, char *argv[]){
   	// LogComponentEnable("LorawanMacHelper", LOG_LEVEL_ALL);
   	// LogComponentEnable("PeriodicSenderHelper", LOG_LEVEL_ALL);
   	// LogComponentEnable("PeriodicSender", LOG_LEVEL_ALL);
-   	// LogComponentEnable("RandomSenderHelper", LOG_LEVEL_ALL);
-  	// LogComponentEnable("RandomSender", LOG_LEVEL_ALL);
+   	 LogComponentEnable("RandomSenderHelper", LOG_LEVEL_ALL);
+  	 LogComponentEnable("RandomSender", LOG_LEVEL_ALL);
   	// LogComponentEnable("LorawanMacHeader", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraFrameHeader", LOG_LEVEL_ALL);
   	// LogComponentEnable("NetworkScheduler", LOG_LEVEL_ALL);
@@ -451,16 +451,17 @@ int main (int argc, char *argv[]){
    	*  Set up the end device's spreading factor  *
    	**********************************************/
 
-  	//sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
+  	sfQuant = macHelper.SetSpreadingFactorsUp (endDevices, gateways, channel, flagRtx);
 	//sfQuant = macHelper.SetSpreadingFactorsEIB (endDevices, radius);
-	sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
+	//sfQuant = macHelper.SetSpreadingFactorsEAB (endDevices, radius);
 	//sfQuant = macHelper.SetSpreadingFactorsProp (endDevices, 0.4, 0, radius);
   	//sfQuant = macHelper.SetSpreadingFactorsStrategies (endDevices, sfQuant, 0.76*nDevices, 0*nDevices, nDevices, LorawanMacHelper::CLASS_TWO);
 
 	for (int i=0; i< 6;i++){	
-		NS_LOG_INFO("SF"<< i+7 << ": " << sfQuant.at(i));
-		if (sfQuant.at(i))
+		if (sfQuant.at(i)){
+			NS_LOG_INFO("SF"<< i+7 << ": " << sfQuant.at(i));
 			maxClass++;
+		}
 	}
 	NS_LOG_INFO("maxClass: " << maxClass);
 
@@ -481,6 +482,7 @@ int main (int argc, char *argv[]){
  
 	RandomSenderHelper appHelper = RandomSenderHelper ();
   	appHelper.SetMean (appPeriodSeconds);
+	//appHelper.SetBound (appPeriodSeconds);
 	appHelper.SetPacketSize (19);
   	ApplicationContainer appContainer = appHelper.Install (endDevices);
 	
@@ -535,6 +537,8 @@ int main (int argc, char *argv[]){
   		LoraPacketTracker &tracker = helper.GetPacketTracker ();
 
 		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), i)) >> sent >> received;
+
+		NS_LOG_INFO("sent: " << sent << "rec: " << received);
 	
 		if(flagRtx)
     		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;

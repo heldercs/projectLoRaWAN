@@ -58,6 +58,8 @@ public:
    	*/
   	void SetMean (int mean);
 
+ 	void SetBound (int bound);
+
 	void SetPacketSize (uint8_t size);
 
 private:

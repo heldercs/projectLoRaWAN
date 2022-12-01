@@ -53,6 +53,7 @@ RandomSender::RandomSender () :
 	
 	m_nextDelay = CreateObject<ExponentialRandomVariable> ();
 	m_nextDelay->SetAttribute ("Mean", DoubleValue (10));
+	//m_nextDelay->SetAttribute ("Bound", DoubleValue (10));
 }
 
 RandomSender::~RandomSender (){
@@ -67,6 +68,11 @@ void RandomSender::SetInitialDelay (Time delay){
 void RandomSender::SetMean (double mean){
   NS_LOG_FUNCTION (this << mean);
   m_nextDelay->SetAttribute ("Mean", DoubleValue(mean));
+}
+
+void RandomSender::SetBound (double bound){
+  NS_LOG_FUNCTION (this << bound);
+  m_nextDelay->SetAttribute ("Bound", DoubleValue(bound));
 }
 
 void RandomSender::SetPacketSize (uint8_t size){
@@ -85,13 +91,12 @@ void RandomSender::SendPacket (void){
     }else{
       	packet = Create<Packet>(m_basePktSize);
     }
-  
 
 	m_mac->Send (packet);
-
+	
     nxtDelay = Seconds(m_nextDelay->GetValue()); 
  	//NS_LOG_DEBUG("nxt: " << nxtDelay.GetSeconds() << " now: " << Simulator::Now().GetSeconds()); 
-	NS_LOG_DEBUG ("The next alarm event with a = " <<
+	NS_LOG_DEBUG ("The next event with a = " <<
                 nxtDelay.GetSeconds() << " Seconds delay");
 	
 	// Schedule the next SendPacket event

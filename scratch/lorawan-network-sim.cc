@@ -205,7 +205,7 @@ int main (int argc, char *argv[]){
   	// LogComponentEnable("GatewayLoraPhy", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraInterferenceHelper", LOG_LEVEL_ALL);
   	// LogComponentEnable("LorawanMac", LOG_LEVEL_ALL);
-  	// LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+  	 LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
   	// LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
   	// LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
   	// LogComponentEnable("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
@@ -220,7 +220,7 @@ int main (int argc, char *argv[]){
   	// LogComponentEnable("LorawanMacHeader", LOG_LEVEL_ALL);
   	// LogComponentEnable("LoraFrameHeader", LOG_LEVEL_ALL);
   	// LogComponentEnable("NetworkScheduler", LOG_LEVEL_ALL);
-  	// LogComponentEnable("NetworkServer", LOG_LEVEL_ALL);
+  	 LogComponentEnable("NetworkServer", LOG_LEVEL_ALL);
   	// LogComponentEnable("NetworkStatus", LOG_LEVEL_ALL);
   	// LogComponentEnable("NetworkController", LOG_LEVEL_ALL);
 
