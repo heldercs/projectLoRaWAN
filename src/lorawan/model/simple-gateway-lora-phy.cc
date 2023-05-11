@@ -122,8 +122,17 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
 {
   NS_LOG_FUNCTION (this << packet << rxPowerDbm << duration << frequencyMHz);
 
+  if(m_interference.GetIncrementalRedundancy()){
+  	LoraTag tag;
+  	packet->RemovePacketTag (tag);
+ 	m_riParams.nodeId = tag.GetNodeId();
+  	m_riParams.rtxLeft = tag.GetNumTx();
+  }
+  
   // Fire the trace source
   m_phyRxBeginTrace (packet);
+
+ // std::cout << "nodeId: " << (unsigned)m_riParams.nodeId << " numTx: " << (unsigned)m_riParams.rtxLeft << std::endl;
 
   if (m_isTransmitting)
     {
@@ -133,6 +142,11 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
                    " because we are in TX mode");
 
       m_phyRxEndTrace (packet);
+
+	  if(m_riParams.rtxLeft == 0 && m_interference.GetIncrementalRedundancy() ){
+		NS_LOG_INFO("clear vector");
+		m_interference.ClearIndexUmap((unsigned)m_riParams.nodeId);
+	  }
 
       // Fire the trace source
       if (m_device)
@@ -147,9 +161,12 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
       return;
     }
 
+
+ // std::cout << "RI: " << (unsigned)m_interference.GetIncrementalRedundancy() << std::endl;
+  
   // Add the event to the LoraInterferenceHelper
   Ptr<LoraInterferenceHelper::Event> event;
-  event = m_interference.Add (duration, rxPowerDbm, sf, packet, frequencyMHz);
+  event = m_interference.Add (duration, rxPowerDbm, sf, packet, frequencyMHz, (unsigned)m_riParams.nodeId, (unsigned)m_interference.GetIncrementalRedundancy());
 
   // Cycle over the receive paths to check availability to receive the packet
   std::list<Ptr<SimpleGatewayLoraPhy::ReceptionPath> >::iterator it;
@@ -177,6 +194,11 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
                            " because under the sensitivity of "
                            << sensitivity << " dBm");
 
+			  if(m_riParams.rtxLeft == 0 && m_interference.GetIncrementalRedundancy()){
+			  	NS_LOG_INFO("clear vector");
+			  	m_interference.ClearIndexUmap((unsigned)m_riParams.nodeId);
+	  		  }
+    
               if (m_device)
                 {
                   m_underSensitivity (packet, m_device->GetNode ()->GetId ());
@@ -217,6 +239,11 @@ SimpleGatewayLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
                << unsigned(sf) <<
                " because no suitable demodulator was found");
 
+  if(m_riParams.rtxLeft == 0 && m_interference.GetIncrementalRedundancy()){
+  	NS_LOG_INFO("clear vector");
+  	m_interference.ClearIndexUmap((unsigned)m_riParams.nodeId);
+  }
+        
   // Fire the trace source
   if (m_device)
     {
@@ -236,13 +263,14 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
 
   // Call the trace source
   m_phyRxEndTrace (packet);
-
+      
   // Call the LoraInterferenceHelper to determine whether there was
   // destructive interference. If the packet is correctly received, this
   // method returns a 0.
   uint8_t packetDestroyed = 0;
   packetDestroyed = m_interference.IsDestroyedByInterference (event);
 
+ 
   // Check whether the packet was destroyed
   if (packetDestroyed != uint8_t (0))
     {
@@ -254,7 +282,12 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
       tag.SetDestroyedBy (packetDestroyed);
       packet->AddPacketTag (tag);
 
-      // Fire the trace source
+	  if(m_riParams.rtxLeft == 0 && m_interference.GetIncrementalRedundancy()){
+	  	NS_LOG_INFO("clear vector");
+	  	m_interference.ClearIndexUmap((unsigned)m_riParams.nodeId);
+	  }
+    
+     // Fire the trace source
       if (m_device)
         {
           m_interferedPacket (packet, m_device->GetNode ()->GetId ());
@@ -270,6 +303,11 @@ SimpleGatewayLoraPhy::EndReceive (Ptr<Packet> packet,
                    unsigned(event->GetSpreadingFactor ()) <<
                    " received correctly");
 
+	  if(m_riParams.rtxLeft == 0 && m_interference.GetIncrementalRedundancy()){
+	  	NS_LOG_INFO("clear vector");
+	  	m_interference.ClearIndexUmap((unsigned)m_riParams.nodeId);
+	  }
+    
       // Fire the trace source
       if (m_device)
         {

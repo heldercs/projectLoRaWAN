@@ -58,23 +58,23 @@ InterferenceTest::DoRun (void)
   Ptr<LoraInterferenceHelper::Event> event1;
 
   // Test overlap duration
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  event1 = interferenceHelper.Add (Seconds (1), 14, 12, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  event1 = interferenceHelper.Add (Seconds (1), 14, 12, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.GetOverlapTime (event, event1), Seconds (1), "Overlap computation didn't give the expected result");
   interferenceHelper.ClearAllEvents ();
 
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  event1 = interferenceHelper.Add (Seconds (1.5), 14, 12, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  event1 = interferenceHelper.Add (Seconds (1.5), 14, 12, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.GetOverlapTime (event, event1), Seconds (1.5), "Overlap computation didn't give the expected result");
   interferenceHelper.ClearAllEvents ();
 
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  event1 = interferenceHelper.Add (Seconds (3), 14, 12, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  event1 = interferenceHelper.Add (Seconds (3), 14, 12, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.GetOverlapTime (event, event1), Seconds (2), "Overlap computation didn't give the expected result");
   interferenceHelper.ClearAllEvents ();
 
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  event1 = interferenceHelper.Add (Seconds (2), 14, 12, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  event1 = interferenceHelper.Add (Seconds (2), 14, 12, 0, frequency, 0, 0);
   // Because of some strange behavior, this test would get stuck if we used the same syntax of the previous ones.
   // This works instead.
   bool retval = interferenceHelper.GetOverlapTime (event, event1) == Seconds (2);
@@ -82,73 +82,73 @@ InterferenceTest::DoRun (void)
   interferenceHelper.ClearAllEvents ();
 
   // Perfect overlap, packet survives
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14, 12, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14, 12, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.IsDestroyedByInterference (event), 0, "Packet did not survive interference as expected");
   interferenceHelper.ClearAllEvents ();
 
   // Perfect overlap, packet survives
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 - 7, 7, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 - 7, 7, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.IsDestroyedByInterference (event), 0, "Packet did not survive interference as expected");
   interferenceHelper.ClearAllEvents ();
 
   // Perfect overlap, packet destroyed
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 - 6, 7, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 - 6, 7, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.IsDestroyedByInterference (event), 7, "Packet was not destroyed by interference as expected");
   interferenceHelper.ClearAllEvents ();
 
   // Partial overlap, packet survives
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  interferenceHelper.Add (Seconds (1), 14 - 6, 7, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (1), 14 - 6, 7, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.IsDestroyedByInterference (event), 0, "Packet did not survive interference as expected");
   interferenceHelper.ClearAllEvents ();
 
   // Different frequencys
   // Packet would be destroyed if they were on the same frequency, but survives
   // since they are on different frequencies
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14, 7, 0, differentFrequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14, 7, 0, differentFrequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.IsDestroyedByInterference (event), 0, "Packet did not survive interference as expected");
   interferenceHelper.ClearAllEvents ();
 
   // Different SFs
   // Packet would be destroyed if they both were SF7, but survives thanks to SF
   // orthogonality
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 + 16, 8, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 + 16, 8, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.IsDestroyedByInterference (event), 0, "Packet did not survive interference as expected");
   interferenceHelper.ClearAllEvents ();
 
   // SF imperfect orthogonality
   // Different SFs are orthogonal only up to a point
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 + 17, 8, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 + 17, 8, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.IsDestroyedByInterference (event), 8, "Packet was not destroyed by interference as expected");
   interferenceHelper.ClearAllEvents ();
 
   // If a more 'distant' SF is used, isolation gets better
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 + 17, 10, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 + 17, 10, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.IsDestroyedByInterference (event), 0, "Packet was destroyed by interference while it should have survived");
   interferenceHelper.ClearAllEvents ();
 
   // Cumulative interference
   // Same-SF interference is cumulative
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 + 16, 8, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 + 16, 8, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 + 16, 8, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 + 16, 8, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 + 16, 8, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 + 16, 8, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.IsDestroyedByInterference (event), 8, "Packet was not destroyed by interference as expected");
   interferenceHelper.ClearAllEvents ();
 
   // Cumulative interference
   // Interference is not cumulative between different SFs
-  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 + 16, 8, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 + 16, 9, 0, frequency);
-  interferenceHelper.Add (Seconds (2), 14 + 16, 10, 0, frequency);
+  event = interferenceHelper.Add (Seconds (2), 14, 7, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 + 16, 8, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 + 16, 9, 0, frequency, 0, 0);
+  interferenceHelper.Add (Seconds (2), 14 + 16, 10, 0, frequency, 0, 0);
   NS_TEST_EXPECT_MSG_EQ (interferenceHelper.IsDestroyedByInterference (event), 0, "Packet did not survive interference as expected");
   interferenceHelper.ClearAllEvents ();
 }

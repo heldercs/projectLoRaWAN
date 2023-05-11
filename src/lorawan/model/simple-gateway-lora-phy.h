@@ -56,6 +56,21 @@ public:
                      double frequencyMHz, double txPowerDbm);
 
 private:
+  	/**
+   	* Structure representing the parameters that will be used in the
+   	* redundancy procedure.
+   	*/
+  	struct RedundancyParameters
+  	{
+    	bool rtxFinish = false;
+		uint8_t nodeId = 0;
+    	uint8_t rtxLeft = 0;
+  	};
+
+  	/* Structure containing the retransmission parameters
+   	* for this device.
+   	*/
+  	struct RedundancyParameters m_riParams;
 };
 
 } /* namespace ns3 */

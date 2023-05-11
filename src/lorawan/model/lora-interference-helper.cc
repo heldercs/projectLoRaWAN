@@ -34,13 +34,15 @@ NS_LOG_COMPONENT_DEFINE ("LoraInterferenceHelper");
 
 // Event Constructor
 LoraInterferenceHelper::Event::Event (Time duration, double rxPowerdBm, uint8_t spreadingFactor,
-                                      Ptr<Packet> packet, double frequencyMHz)
+                                      Ptr<Packet> packet, double frequencyMHz, uint8_t nodeId, uint8_t irType)
     : m_startTime (Simulator::Now ()),
       m_endTime (m_startTime + duration),
       m_sf (spreadingFactor),
       m_rxPowerdBm (rxPowerdBm),
       m_packet (packet),
-      m_frequencyMHz (frequencyMHz)
+      m_frequencyMHz (frequencyMHz),
+	  m_nodeId(nodeId),
+	  m_irType(irType)
 {
   // NS_LOG_FUNCTION_NOARGS ();
 }
@@ -92,6 +94,18 @@ double
 LoraInterferenceHelper::Event::GetFrequency (void) const
 {
   return m_frequencyMHz;
+}
+
+uint8_t
+LoraInterferenceHelper::Event::GetNodeId (void) const
+{
+  return m_nodeId;
+}
+
+uint8_t
+LoraInterferenceHelper::Event::GetIrType (void) const
+{
+  return m_irType;
 }
 
 void
@@ -162,6 +176,7 @@ LoraInterferenceHelper::SetCollisionMatrix (
     }
 }
 
+
 TypeId
 LoraInterferenceHelper::GetTypeId (void)
 {
@@ -174,7 +189,8 @@ LoraInterferenceHelper::GetTypeId (void)
   LoraInterferenceHelper::LoraInterferenceHelper () : m_collisionSnir(LoraInterferenceHelper::collisionSnirGoursaud)
 {
   NS_LOG_FUNCTION (this);
-
+  //m_incrementalRed = CHASECOMBINING;
+  m_incrementalRed = NOREDUNDANCY;
   SetCollisionMatrix (collisionMatrix);
 }
 
@@ -187,7 +203,7 @@ Time LoraInterferenceHelper::oldEventThreshold = Seconds (2);
 
 Ptr<LoraInterferenceHelper::Event>
 LoraInterferenceHelper::Add (Time duration, double rxPower, uint8_t spreadingFactor,
-                             Ptr<Packet> packet, double frequencyMHz)
+                             Ptr<Packet> packet, double frequencyMHz, uint8_t nodeId, uint8_t irType)
 {
 
   NS_LOG_FUNCTION (this << duration.GetSeconds () << rxPower << unsigned(spreadingFactor) << packet
@@ -195,7 +211,7 @@ LoraInterferenceHelper::Add (Time duration, double rxPower, uint8_t spreadingFac
 
   // Create an event based on the parameters
   Ptr<LoraInterferenceHelper::Event> event = Create<LoraInterferenceHelper::Event> (
-      duration, rxPower, spreadingFactor, packet, frequencyMHz);
+      duration, rxPower, spreadingFactor, packet, frequencyMHz, nodeId, irType);
 
   // Add the event to the list
   m_events.push_back (event);
@@ -339,7 +355,28 @@ LoraInterferenceHelper::IsDestroyedByInterference (Ptr<LoraInterferenceHelper::E
           10 * log10 (signalEnergy / cumulativeInterferenceEnergy.at (unsigned(currentSf) - 7));
       NS_LOG_DEBUG ("The current SNIR is " << snir << " dB");
 
-      if (snir >= snirIsolation)
+
+     // add incremental redundancy case 
+	  switch ( event->GetIrType() ) {
+			  case CHASECOMBINING:
+				std::cout << "CC: " << (unsigned)event->GetIrType();
+				if(m_chaseCombiningSnir.count(unsigned(event->GetNodeId()))>0){
+					m_chaseCombiningSnir[unsigned(event->GetNodeId())][unsigned(currentSf) - 7].push_back(snir);
+				}else{
+					m_chaseCombiningSnir[unsigned(event->GetNodeId())].resize(6);
+					m_chaseCombiningSnir[unsigned(event->GetNodeId())][unsigned(currentSf) - 7].push_back(snir);
+				}
+				snir = 0;	
+				for(auto snir_p = m_chaseCombiningSnir[unsigned(event->GetNodeId())][unsigned(currentSf) - 7].begin();  snir_p != m_chaseCombiningSnir[unsigned(event->GetNodeId())][unsigned(currentSf) - 7].end(); ++snir_p)
+					snir += 1./ *snir_p;
+				snir=pow(m_chaseCombiningSnir[unsigned(event->GetNodeId())][unsigned(currentSf) - 7].size(),2)*(1./ snir);
+			    std::cout << " The current SNIR is " << snir << " dB" << std::endl;
+		  break;
+			  default:
+			  break;
+	  }	/* -----  end switch  ----- */
+
+	  if (snir >= snirIsolation)
         {
           // Move on and check the rest of the interferers
           NS_LOG_DEBUG ("Packet survived interference with SF " << currentSf);
@@ -364,6 +401,22 @@ LoraInterferenceHelper::ClearAllEvents (void)
   NS_LOG_FUNCTION_NOARGS ();
 
   m_events.clear ();
+}
+
+void
+LoraInterferenceHelper::ClearIndexUmap (uint8_t idx)
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  for(uint8_t j=0; j<8; j++)
+	 m_chaseCombiningSnir[unsigned(idx)][unsigned(j)].clear();
+}
+
+uint8_t 
+LoraInterferenceHelper::GetIncrementalRedundancy (void){
+	NS_LOG_FUNCTION_NOARGS();
+
+	return(m_incrementalRed);
 }
 
 Time

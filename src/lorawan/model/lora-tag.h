@@ -114,7 +114,7 @@ public:
    *
    * \return The data rate that needs to be employed for this packet.
    */
-  uint8_t GetDataRate (void);
+  uint8_t GetDataRate () const;
 
   /**
    * Set the data rate for this packet.
@@ -123,6 +123,34 @@ public:
    */
   void SetDataRate (uint8_t dataRate);
 
+  /**
+   * Get the nonde id for this packet.
+   *
+   * \return The node id that needs to be employed for this packet.
+   */
+  uint8_t GetNodeId (void);
+
+  /**
+   * Set the node id for this packet.
+   *
+   * \param NodeId The node id.
+   */
+  void SetNodeId (uint8_t nodeId);
+
+  /**
+   * Get the num Tx for this packet.
+   *
+   * \return The num Tx that needs to be employed for this packet.
+   */
+  uint8_t GetNumTx (void);
+
+  /**
+   * Set the num Tx for this packet.
+   *
+   * \param dataRate The data rate.
+   */
+  void SetNumTx (uint8_t numTx);
+
 private:
   uint8_t m_sf; //!< The Spreading Factor used by the packet.
   uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
@@ -130,6 +158,8 @@ private:
   uint8_t m_dataRate; //!< The Data Rate that needs to be used to send this
   //!packet.
   double m_frequency; //!< The frequency of this packet
+  uint8_t m_nodeId;
+  uint8_t m_numTx;
 };
 } // namespace ns3
 }

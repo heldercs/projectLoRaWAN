@@ -45,10 +45,10 @@ public:
   /**
    * Define the operational region.
    */
-  enum Regions { EU, US, China, EU433MHz, Australia, CN, AS923MHz, SouthKorea, ALOHA };
+  enum Regions { EU, US, China, EU433MHz, Australia, Brazil, CN, AS923MHz, SouthKorea, ALOHA };
 
   /**
-   * Define the operational region.
+   * Define the strategies of SF allocation.
    */
   enum StrategieSF { SHIFT_ONE, SHIFT_TWO, CLASS_TWO, CLASS_THREE, ALM_FI, ALM_PI, SERVE };
 
@@ -137,6 +137,22 @@ private:
    * ClassAEndDeviceLorawanMac classes.
    */
   void ApplyCommonEuConfigurations (Ptr<LorawanMac> lorawanMac) const;
+
+  /**
+   * Perform region-specific configurations for the 915 MHz BR band.
+   */
+  void ConfigureForBrazilRegion (Ptr<ClassAEndDeviceLorawanMac> edMac) const;
+
+  /**
+   * Perform region-specific configurations for the 915 MHz BR band.
+   */
+  void ConfigureForBrazilRegion (Ptr<GatewayLorawanMac> gwMac) const;
+
+  /**
+   * Apply configurations that are common both for the GatewayLorawanMac and the
+   * ClassAEndDeviceLorawanMac classes.
+   */
+  void ApplyCommonBrazilConfigurations (Ptr<LorawanMac> lorawanMac) const;
 
   /**
    * Perform region-specific configurations for the ALOHA band.

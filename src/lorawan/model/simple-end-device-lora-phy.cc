@@ -60,6 +60,9 @@ SimpleEndDeviceLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams,
 
   NS_LOG_INFO ("Current state: " << m_state);
 
+
+  //std::cout << "SED - id: " <<  m_device->GetNode()->GetId()  << std::endl;
+
   // We must be either in STANDBY or SLEEP mode to send a packet
   if (m_state != STANDBY && m_state != SLEEP)
     {
@@ -77,6 +80,7 @@ SimpleEndDeviceLoraPhy::Send (Ptr<Packet> packet, LoraTxParameters txParams,
   LoraTag tag;
   packet->RemovePacketTag (tag);
   tag.SetSpreadingFactor (txParams.sf);
+  tag.SetNodeId(m_device->GetNode()->GetId());
   packet->AddPacketTag (tag);
 
   // Send the packet over the channel
@@ -127,7 +131,7 @@ SimpleEndDeviceLoraPhy::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
   // still incoming.
 
   Ptr<LoraInterferenceHelper::Event> event;
-  event = m_interference.Add (duration, rxPowerDbm, sf, packet, frequencyMHz);
+  event = m_interference.Add (duration, rxPowerDbm, sf, packet, frequencyMHz, m_device->GetNode ()->GetId (), 0);
 
   // Switch on the current PHY state
   switch (m_state)

@@ -25,6 +25,7 @@
 #include "ns3/class-a-end-device-lorawan-mac.h"
 #include "ns3/end-device-lorawan-mac.h"
 #include "ns3/end-device-lora-phy.h"
+#include "ns3/lora-tag.h"
 #include "ns3/log.h"
 #include <algorithm>
 
@@ -89,6 +90,14 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
       m_txPower = 14; // Reset transmission power
       m_dataRate = m_dataRate - 1;
     }
+
+  LoraTag tag;
+  packetToSend->RemovePacketTag (tag);
+  tag.SetNumTx(m_retxParams.retxLeft);
+  packetToSend->AddPacketTag(tag);
+
+  //std::cout << "rtx: " <<  (unsigned)m_retxParams.retxLeft  << std::endl;
+
 
   // Craft LoraTxParameters object
   LoraTxParameters params;

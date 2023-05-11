@@ -2,8 +2,8 @@
 
 if [ $# -ne 8 ]
 then
-echo "parameters missing"
-exit 1
+	echo "parameters missing"
+	exit 1
 fi
 
 gwRing=$2
@@ -17,7 +17,7 @@ trial=$8
 echo "##### Simulation Start #####"
 
 if [ ! -d TestResult/ ]
-	then
+then
 	mkdir TestResult/
 fi
 
@@ -72,7 +72,7 @@ then
 		for numSeed in {1..5}
 		do
 			echo -ne "$numSeed \r"
-  			#./waf --run "lorawan-network-sim --nSeed=$RANDOM --nDevices=$numSta --nGateways=$gwRing --radius=$rad --gatewayRadius=$gwRad --simulationTime=$simTime --appPeriod=$interval --file1=$file1 --file2=$file2 --printEDs=$pEDs --trial=$trial"  > ./TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/record-$numSta.txt 2>&1
+  			./waf --run "lorawan-network-sim --nSeed=$RANDOM --nDevices=$numSta --nGateways=$gwRing --radius=$rad --gatewayRadius=$gwRad --simulationTime=$simTime --appPeriod=$interval --file1=$file1 --file2=$file2 --printEDs=$pEDs --trial=$trial"  > ./TestResult/test$trial/traffic-$interval/pcap-sta-$numSta/record-$numSta.txt 2>&1
 		done
 	echo ""
 	done
@@ -86,7 +86,7 @@ then
 	file2="./TestResult/test$trial/traffic-$interval/mac-STAs-GW-$gwRing.txt"
 
 
-	for numSta in {100..200..100}
+	for numSta in {1..2..1}
 	do
 			echo "trial:$trial-numSTA:$numSta #"
 
@@ -175,6 +175,6 @@ else
 fi
 echo "##### Simulation finish #####"
 #echo "seinding email..."
-#'echo simulation finish | mail -s Simulator helderhdw@gmail.com
+#echo simulation finish | mail -s Simulator helderhdw@gmail.com
 
 

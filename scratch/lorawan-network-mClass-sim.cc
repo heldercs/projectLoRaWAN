@@ -242,7 +242,7 @@ int main (int argc, char *argv[]){
  	string fileData="./scratch/mac-STAs-GW-1.txt";
 	string endDevFile="./TestResult/test";
 	string gwFile="./TestResult/test";
-	bool flagRtx=0; //, sizeStatus=0;
+	bool flagRtx=true; //, sizeStatus=0;
   	uint32_t nSeed=1, maxClass=0;
 	int trial=1; //, nCount=0, nClass1=0, nClass2=0, nClass3=0;
 	vector<int> sfQuant(6,0);
@@ -269,31 +269,34 @@ int main (int argc, char *argv[]){
 	
   	// Set up logging
   	 LogComponentEnable ("LorawanNetworkSimulator", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LoraPacketTracker", LOG_LEVEL_ALL);
-  	 LogComponentEnable("LoraChannel", LOG_LEVEL_INFO);
-  	// LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
-  	// LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
-  	// LogComponentEnable("GatewayLoraPhy", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LoraInterferenceHelper", LOG_LEVEL_ALL);
-  	 LogComponentEnable("LorawanMac", LOG_LEVEL_ALL);
-  	 LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
-  	 LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
-  	// LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LogicalLoraChannel", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LoraHelper", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LoraPhyHelper", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LorawanMacHelper", LOG_LEVEL_ALL);
-  	// LogComponentEnable("PeriodicSenderHelper", LOG_LEVEL_ALL);
-  	// LogComponentEnable("PeriodicSender", LOG_LEVEL_ALL);
-   	 LogComponentEnable("RandomSenderHelper", LOG_LEVEL_ALL);
-  	 LogComponentEnable("RandomSender", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LorawanMacHeader", LOG_LEVEL_ALL);
-  	// LogComponentEnable("LoraFrameHeader", LOG_LEVEL_ALL);
-  	// LogComponentEnable("NetworkScheduler", LOG_LEVEL_ALL);
-  	// LogComponentEnable("NetworkServer", LOG_LEVEL_ALL);
-  	// LogComponentEnable("NetworkStatus", LOG_LEVEL_ALL);
-  	// LogComponentEnable("NetworkController", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LoraPacketTracker", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LoraChannel", LOG_LEVEL_INFO);
+  	 //LogComponentEnable("LoraPhy", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("EndDeviceLoraPhy", LOG_LEVEL_ALL);
+   	 //LogComponentEnable("SimpleEndDeviceLoraPhy", LOG_LEVEL_ALL);
+ 	 //LogComponentEnable("GatewayLoraPhy", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("SimpleGatewayLoraPhy", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LoraInterferenceHelper", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LorawanMac", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("EndDeviceLorawanMac", LOG_LEVEL_ALL);
+	 //LogComponentEnable("EndDeviceStatus", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("GatewayLorawanMac", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LogicalLoraChannelHelper", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LogicalLoraChannel", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LoraHelper", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LoraPhyHelper", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LorawanMacHelper", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("PeriodicSenderHelper", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("PeriodicSender", LOG_LEVEL_ALL);
+   	 //LogComponentEnable("RandomSenderHelper", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("RandomSender", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LorawanMacHeader", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("LoraFrameHeader", LOG_LEVEL_ALL);
+     //LogComponentEnable("NetworkScheduler", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("NetworkServer", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("NetworkStatus", LOG_LEVEL_ALL);
+  	 //LogComponentEnable("NetworkController", LOG_LEVEL_ALL);
 
   	/***********
    	*  Setup  *
@@ -401,7 +404,7 @@ int main (int argc, char *argv[]){
       	Ptr<Node> node = *j;
       	Ptr<LoraNetDevice> loraNetDevice = node->GetDevice (0)->GetObject<LoraNetDevice> ();
       	Ptr<LoraPhy> phy = loraNetDevice->GetPhy ();
-	 
+ 
       	if (flagRtx){
       		Ptr<EndDeviceLorawanMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLorawanMac>();
 	  		mac->SetMaxNumberOfTransmissions (MAXRTX);
@@ -473,19 +476,18 @@ int main (int argc, char *argv[]){
 
   	Time appStopTime = Seconds (simulationTime);
  
- 	/*  PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
+ 	PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
   	appHelper.SetPeriod (Seconds (appPeriodSeconds));	
 	appHelper.SetPacketSize (19);
   	ApplicationContainer appContainer = appHelper.Install (endDevices);
-	*/
 
  
-	RandomSenderHelper appHelper = RandomSenderHelper ();
+	/*  RandomSenderHelper appHelper = RandomSenderHelper ();
   	appHelper.SetMean (appPeriodSeconds);
 	//appHelper.SetBound (appPeriodSeconds);
 	appHelper.SetPacketSize (19);
   	ApplicationContainer appContainer = appHelper.Install (endDevices);
-	
+	*/
 
   	appContainer.Start (Seconds (0));
   	appContainer.Stop (appStopTime);
@@ -538,8 +540,6 @@ int main (int argc, char *argv[]){
 
 		stringstream(tracker.CountMacPacketsGlobally (Seconds (0), appStopTime + Hours (1), i)) >> sent >> received;
 
-		NS_LOG_INFO("sent: " << sent << "rec: " << received);
-	
 		if(flagRtx)
     		stringstream(tracker.CountMacPacketsGloballyCpsr (Seconds (0), appStopTime + Hours (1))) >> avgDelay;
 		else

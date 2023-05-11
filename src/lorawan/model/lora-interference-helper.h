@@ -29,6 +29,7 @@
 #include "ns3/packet.h"
 #include "ns3/logical-lora-channel.h"
 #include <list>
+#include <unordered_map>
 
 namespace ns3 {
 namespace lorawan {
@@ -54,7 +55,7 @@ public:
 
   public:
     Event (Time duration, double rxPowerdBm, uint8_t spreadingFactor, Ptr<Packet> packet,
-           double frequencyMHz);
+           double frequencyMHz, uint8_t nodeId, uint8_t irType);
     ~Event ();
 
     /**
@@ -93,6 +94,16 @@ public:
     double GetFrequency (void) const;
 
     /**
+     * Get the frequency this event was on.
+     */
+    uint8_t GetNodeId (void) const;
+
+    /**
+     * Get the incremental redundancy type this event was on.
+     */
+    uint8_t GetIrType (void) const;
+
+    /**
      * Print the current event in a human readable form.
      */
     void Print (std::ostream &stream) const;
@@ -127,12 +138,31 @@ public:
      * The frequency this event was on.
      */
     double m_frequencyMHz;
+
+    /**
+     * The node ID this event was on.
+     */
+    uint8_t m_nodeId;
+
+   /**
+     * The incremental redundancy type this event was on.
+     */
+    uint8_t m_irType;
+
   };
 
   enum CollisionMatrix {
     GOURSAUD,
     ALOHA,
   };
+
+  enum IncrementalRedundancy {
+    NOREDUNDANCY,
+    CHASECOMBINING,
+	CODEWORDPARITY,
+	BUNDLEPARITY,
+  };
+
 
   static TypeId GetTypeId (void);
 
@@ -151,7 +181,7 @@ public:
    * \return the newly created event
    */
   Ptr<LoraInterferenceHelper::Event> Add (Time duration, double rxPower, uint8_t spreadingFactor,
-                                          Ptr<Packet> packet, double frequencyMHz);
+                                          Ptr<Packet> packet, double frequencyMHz, uint8_t nodeId, uint8_t irType);
 
   /**
    * Get a list of the interferers currently registered at this
@@ -196,13 +226,28 @@ public:
    */
   void CleanOldEvents (void);
 
+  /**
+   *  in this LoraInterferenceHelper.
+   */
+  uint8_t GetIncrementalRedundancy (void);
+
+  /**
+   * Delete index in unordered map in the LoraInterferenceHelper.
+   */
+  void  ClearIndexUmap(uint8_t idx);
+
   static CollisionMatrix collisionMatrix;
 
   static std::vector<std::vector<double>> collisionSnirAloha;
   static std::vector<std::vector<double>> collisionSnirGoursaud;
 
+
 private:
   void SetCollisionMatrix (enum CollisionMatrix collisionMatrix);
+
+  std::unordered_map<uint8_t, std::vector<std::vector<double>>> m_chaseCombiningSnir;
+ 
+  uint8_t m_incrementalRed;
 
   std::vector<std::vector<double>> m_collisionSnir;
 
